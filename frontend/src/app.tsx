@@ -27,6 +27,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [timeFlow, setTimeFlow] = useState(200);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
+  const [useNASAData, setUseNASAData] = useState(false); // Toggle per dati NASA
 
   useEffect(() => {
     getAllExoplanets()
@@ -58,6 +59,7 @@ export default function App() {
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
         timeFlow={timeFlow}
+        useNASAData={useNASAData}
       />
 
       {/* HUD e controlli */}
@@ -75,7 +77,24 @@ export default function App() {
           slot="bottom-left"
           onInsert={(p) => setPlanets((prev) => [...prev, p])}
         />
-        <TimeBar slot="bottom-right" time={timeFlow} onChange={setTimeFlow} />
+        <div slot="bottom-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <TimeBar time={timeFlow} onChange={setTimeFlow} />
+          <button
+            onClick={() => setUseNASAData(!useNASAData)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: useNASAData ? '#0066cc' : '#333',
+              color: 'white',
+              border: '1px solid #555',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}
+          >
+            {useNASAData ? '🚀 NASA API' : '📊 Local Data'}
+          </button>
+        </div>
       </HUD>
 
       <InfoPanel planet={selectedPlanet} />
