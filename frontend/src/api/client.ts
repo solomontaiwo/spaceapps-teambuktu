@@ -1,5 +1,5 @@
-const BASE_URL = "http://127.0.0.1:8000";
-const API = BASE_URL; // <-- togli /api
+const BASE_URL = "https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net";
+const API = BASE_URL; // Backend Azure endpoint
 
 async function handle(res: Response) {
   if (!res.ok) {
