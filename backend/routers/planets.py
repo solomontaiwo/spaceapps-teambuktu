@@ -43,5 +43,21 @@ def add_planet(planet: dict, db: Session = Depends(get_db)):
 # (Opzionale) GET /planets/all — ritorna tutti i pianeti dal CSV
 @router.get("/all")
 def get_planets_all():
-    planets = get_all_planets()
-    return planets
+    import csv
+    with open("data/KOI_cleaned.csv", newline='', encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        planets = []
+        for row in reader:
+            planets.append({
+                "name": row.get("kepoi_name"),
+                "radius": float(row.get("koi_prad")) if row.get("koi_prad") else None,
+                "distance": float(row.get("koi_sma")) if row.get("koi_sma") else None,
+                "temperature": float(row.get("koi_teq")) if row.get("koi_teq") else None,
+                "starTemperature": float(row.get("koi_steff")) if row.get("koi_steff") else None,
+                "coordinates": {
+                    "ra": float(row.get("ra")) if row.get("ra") else None,
+                    "dec": float(row.get("dec")) if row.get("dec") else None
+                }
+            })
+        return planets
+ 

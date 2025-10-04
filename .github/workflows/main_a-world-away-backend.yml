@@ -29,25 +29,34 @@ jobs:
           python -m venv venv
           source venv/bin/activate
       
-      - name: Install dependencies
+      - name: Install dependencies (for build validation only)
         run: pip install -r backend/requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      - name: Create backend zip
-        run: |
-          zip -r backend.zip backend -x "*/venv/*"
 
-      - name: List files (debug)
+      - name: Prepare deploy folder
         run: |
-          ls -al .
-          ls -al backend || true
+          rm -rf app
+          mkdir app
+          cp -R backend app/backend
+          # Copia requirements alla root come si aspetta Azure
+          cp backend/requirements.txt app/requirements.txt
+          # (Opzionale) file startup: potresti creare uno script se servisse
+          echo "# Deployment package ready" > app/README_DEPLOY.txt
+          ls -al app
+
+      - name: Create deployment zip
+        run: |
+          cd app
+          zip -r ../app.zip .
+          cd ..
+          ls -al app.zip
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            backend.zip
+          path: app.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -62,7 +71,9 @@ jobs:
         with:
           name: python-app
           path: .
-      
+      - name: Inspect downloaded artifact
+        run: unzip -l app.zip | head -n 40
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -76,5 +87,5 @@ jobs:
         with:
           app-name: 'a-world-away-backend'
           slot-name: 'Production'
-          package: './backend.zip'
-
+          package: './app.zip'
+          
