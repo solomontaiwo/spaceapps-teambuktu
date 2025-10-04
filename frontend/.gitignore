@@ -1,3 +1,6 @@
 # Miscellaneous
 .DS_Store
 node_modules
+
+# Frontend
+frontend/dist/*
