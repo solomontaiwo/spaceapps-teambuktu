@@ -9,3 +9,5 @@
 backend/.idea/
 backend/__pycache__/
 .idea/
+__pycache__/
+**/__pycache__/

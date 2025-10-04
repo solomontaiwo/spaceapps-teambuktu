@@ -1,3 +1,3 @@
 # Challenge: A World Away: Hunting for Exoplanets with AI
 
-Data from several different space-based exoplanet surveying missions have enabled discovery of thousands of new planets outside our solar system, but most of these exoplanets were identified manually. With advances in artificial intelligence and machine learning (AI/ML), it is possible to automatically analyze large sets of data collected by these missions to identify exoplanets. Your challenge is to create an AI/ML model that is trained on one or more of the open-source exoplanet datasets offered by NASA and that can analyze new data to accurately identify exoplanets. (Astrophysics Division)
+Are we alone in the universe? Maybe not. With Exobabel, we empower scientists and enthusiasts to explore this question by providing a simple, effective, and user-friendly platform for discovering and analyzing exoplanet data.
