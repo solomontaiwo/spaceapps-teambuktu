@@ -2,7 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/icon3.png" />
+  <!-- Favicon & app icons -->
+  <!-- Usa percorsi relativi così funziona anche se l'app è servita da una sottocartella -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icon3.png?v=1" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icon3.png?v=1" />
+  <!-- Fallback ICO (se aggiungi un favicon.ico in public/) -->
+  <link rel="shortcut icon" href="favicon.ico" />
+  <!-- Apple / iOS (opzionale: duplica l'icona esistente) -->
+  <link rel="apple-touch-icon" href="icon3.png?v=1" />
+  <meta name="theme-color" content="#000000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Exobabel</title>
   </head>
