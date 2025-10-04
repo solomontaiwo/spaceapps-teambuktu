@@ -16,33 +16,41 @@ export default function InsertPlanet({ onInsert }: Props) {
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "number" ? parseFloat(value) : value
+    });
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onInsert({
-      ...form,
-      radius: parseFloat(String(form.radius)),
-      distance: parseFloat(String(form.distance)),
-      orbitalPeriod: parseFloat(String(form.orbitalPeriod))
-    });
+    onInsert(form);
     setOpen(false);
+    setForm({
+      name: "",
+      radius: 1,
+      distance: 1,
+      orbitalPeriod: 365,
+      color: "#5ec8f8"
+    });
   }
 
   return (
-    <div style={{ position: "absolute", bottom: 20, right: 20, zIndex: 20 }}>
+    <div style={{ position: "absolute", bottom: 20, left: 20, zIndex: 20 }}>
       {!open ? (
         <button
           onClick={() => setOpen(true)}
           style={{
-            padding: "10px 16px",
-            background: "#25d366",
+            padding: "10px 18px",
+            background: "linear-gradient(90deg, #2b5876, #4e4376)",
             border: "none",
-            borderRadius: 10,
+            borderRadius: 12,
             color: "white",
-            fontWeight: "bold",
-            cursor: "pointer"
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            cursor: "pointer",
+            boxShadow: "0 0 10px rgba(255,255,255,0.3)"
           }}
         >
           + Insert Planet
@@ -51,21 +59,45 @@ export default function InsertPlanet({ onInsert }: Props) {
         <form
           onSubmit={handleSubmit}
           style={{
-            background: "rgba(0,0,20,0.9)",
+            background: "rgba(10, 10, 30, 0.95)",
             padding: 16,
             borderRadius: 12,
             color: "white",
-            width: "260px"
+            width: "270px",
+            boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(5px)"
           }}
         >
-          <h4>New Exoplanet</h4>
-          <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-          <input name="radius" type="number" placeholder="Radius" value={form.radius} onChange={handleChange} />
-          <input name="distance" type="number" placeholder="Distance (AU)" value={form.distance} onChange={handleChange} />
-          <input name="orbitalPeriod" type="number" placeholder="Period (days)" value={form.orbitalPeriod} onChange={handleChange} />
-          <input name="color" type="color" value={form.color} onChange={handleChange} />
-          <button type="submit" style={{ marginTop: 10, padding: "6px 10px" }}>Add</button>
-          <button type="button" onClick={() => setOpen(false)} style={{ marginLeft: 10 }}>Cancel</button>
+          <h4 style={{ marginTop: 0 }}>Add Exoplanet</h4>
+          {["name", "radius", "distance", "orbitalPeriod"].map((f) => (
+            <input
+              key={f}
+              name={f}
+              placeholder={f}
+              type={f === "name" ? "text" : "number"}
+              value={form[f as keyof Planet]}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                marginBottom: 8,
+                borderRadius: 6,
+                border: "none",
+                padding: "6px 8px",
+              }}
+              required={f === "name"}
+            />
+          ))}
+          <input
+            name="color"
+            type="color"
+            value={form.color}
+            onChange={handleChange}
+            style={{ width: "100%", marginBottom: 8 }}
+          />
+          <div style={{ marginTop: 10 }}>
+            <button type="submit" style={{ marginRight: 10 }}>Save</button>
+            <button type="button" onClick={() => setOpen(false)}>Cancel</button>
+          </div>
         </form>
       )}
     </div>

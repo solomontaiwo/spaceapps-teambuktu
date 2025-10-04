@@ -10,17 +10,29 @@ type PlanetProps = {
   orbitalPeriod: number;
   onSelect?: () => void;
   isSelected?: boolean;
+  timeFlow: number; // aggiunto
 };
 
-export default function Planet({ name, distance, radius, color = "#aaaaaa", orbitalPeriod, onSelect, isSelected }: PlanetProps) {
+export default function Planet({
+  name,
+  distance,
+  radius,
+  color = "#aaaaaa",
+  orbitalPeriod,
+  onSelect,
+  isSelected,
+  timeFlow // aggiunto
+}: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null!);
   const angleRef = useRef(Math.random() * Math.PI * 2);
 
   useFrame((_, delta) => {
-    angleRef.current += (2 * Math.PI / orbitalPeriod) * delta * 20;
+    const speed = (delta * timeFlow) / 20; // timeFlow influenza velocità
+    angleRef.current += (2 * Math.PI / orbitalPeriod) * speed;
     const x = distance * Math.cos(angleRef.current);
     const z = distance * Math.sin(angleRef.current);
     meshRef.current.position.set(x, 0, z);
+    meshRef.current.rotation.y += speed * 0.5; // rotazione pianeta
   });
 
   return (
