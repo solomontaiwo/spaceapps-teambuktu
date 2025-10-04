@@ -14,3 +14,15 @@ class PlanetCreate(PlanetBase):
 class PlanetRead(PlanetBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+class Planet(BaseModel):
+    id: int
+    name: str
+    radius: float | None = None
+    star_temp: float | None = None
+    star_radius: float | None = None
+    ra: float | None = None
+    dec: float | None = None
+
+    class Config:
+        orm_mode = True

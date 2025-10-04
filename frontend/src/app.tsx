@@ -17,11 +17,14 @@ export default function App() {
     fetch("http://127.0.0.1:8000/planets")
       .then((res) => res.json())
       .then((data) => {
-        // distribuzione galattica 3D
+        // distribuzione galattica 3D + colori dinamici
         const normalized = data.slice(0, 300).map((p: any, i: number) => ({
           ...p,
           radius: Math.max(0.3, (p.radius ?? 1) / 3),
-          color: `hsl(${(i * 47) % 360}, 70%, 55%)`,
+          color:
+            p.star_temp && p.star_temp > 0
+              ? `hsl(${Math.max(0, Math.min(240 - p.star_temp / 30, 240))}, 80%, 60%)`
+              : `hsl(${(i * 47) % 360}, 70%, 50%)`,
           x: (Math.random() - 0.5) * 200,
           y: (Math.random() - 0.5) * 40,
           z: (Math.random() - 0.5) * 200,
