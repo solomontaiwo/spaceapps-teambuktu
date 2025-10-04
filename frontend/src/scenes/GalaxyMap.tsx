@@ -3,51 +3,6 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-/* -------------------- API NASA Exoplanet Archive -------------------- */
-const NASA_API_URL = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name,pl_orbper,pl_rade,pl_eqt,pl_masse,st_teff,ra,dec,sy_dist&format=json&where=pl_rade<10 and pl_orbper<1000";
-
-interface NASAExoplanet {
-  pl_name: string;
-  pl_orbper: number;    // Orbital period in days
-  pl_rade: number;      // Planet radius in Earth radii
-  pl_eqt: number;       // Equilibrium temperature in K
-  pl_masse: number;     // Planet mass in Earth masses
-  st_teff: number;      // Stellar effective temperature in K
-  ra: number;           // Right ascension in degrees
-  dec: number;          // Declination in degrees
-  sy_dist: number;      // Distance to system in parsecs
-}
-
-/**
- * 🚀 Fetch realistic exoplanet data from NASA Exoplanet Archive
- */
-async function fetchNASAExoplanets(): Promise<NASAExoplanet[]> {
-  try {
-    console.log("🚀 Fetching NASA Exoplanet data...");
-    const response = await fetch(NASA_API_URL);
-    if (!response.ok) {
-      throw new Error(`NASA API Error: ${response.status}`);
-    }
-    const data = await response.json();
-    
-    // Filter and validate the data
-    const filteredData = data.filter((planet: any) => 
-      planet.pl_name && 
-      planet.ra !== null && 
-      planet.dec !== null &&
-      planet.pl_rade !== null &&
-      planet.pl_eqt !== null &&
-      planet.st_teff !== null
-    ).slice(0, 500); // Limit for performance
-    
-    console.log(`✅ Loaded ${filteredData.length} NASA exoplanets`);
-    return filteredData;
-  } catch (error) {
-    console.error("❌ Failed to fetch NASA exoplanet data:", error);
-    return [];
-  }
-}
-
 /* -------------------- Costanti Astronomiche -------------------- */
 const GALAXY_R = 120;   // raggio del guscio dove sparpagliamo i sistemi
 const AU_SCALE = 2.0;   // scala visuale per 1 AU
@@ -344,77 +299,18 @@ export default function GalaxyMap({
   onSelect,
   selected,
   timeFlow,
-  useNASAData = false,
 }: {
   planets: any[];
   onSelect: (p: any) => void;
   selected?: any;
   timeFlow: number;
-  useNASAData?: boolean;
 }) {
   const controlsRef = useRef<any>(null);
   const [focus, setFocus] = useState<THREE.Vector3 | null>(null);
   const [focusDistance, setFocusDistance] = useState(35);
-  const [nasaData, setNasaData] = useState<NASAExoplanet[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  // 🚀 Fetch NASA data when enabled
-  useEffect(() => {
-    if (useNASAData && nasaData.length === 0) {
-      setLoading(true);
-      fetchNASAExoplanets()
-        .then(setNasaData)
-        .finally(() => setLoading(false));
-    }
-  }, [useNASAData, nasaData.length]);
-
-  // Convert NASA data to consistent format
-  const dataSource = useMemo(() => {
-    if (!useNASAData) return planets;
-    
-    return nasaData.map(p => ({
-      name: p.pl_name,
-      koi_period: p.pl_orbper,
-      period: p.pl_orbper,
-      koi_prad: p.pl_rade,
-      radius: p.pl_rade,
-      koi_teq: p.pl_eqt,
-      eq_temp: p.pl_eqt,
-      koi_steff: p.st_teff,
-      star_temp: p.st_teff,
-      ra: p.ra,
-      dec: p.dec,
-      sy_dist: p.sy_dist,
-      // Add realistic properties
-      koi_kepmag: 12 + Math.random() * 4, // Estimated magnitude
-      masse: p.pl_masse || 1,
-      isNASA: true
-    }));
-  }, [useNASAData, nasaData, planets]);
-
-  const filtered = useMemo(() => dataSource.slice(0, 200), [dataSource]);
+  const filtered = useMemo(() => planets.slice(0, 200), [planets]);
   const clusterCenter = useClusterCenter(filtered);
-
-  // Loading screen for NASA data
-  if (useNASAData && loading) {
-    return (
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        color: 'white',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        textAlign: 'center'
-      }}>
-        🚀 Loading NASA Exoplanet Archive...<br/>
-        <div style={{ fontSize: '14px', marginTop: '10px', opacity: 0.7 }}>
-          Fetching real astronomical data
-        </div>
-      </div>
-    );
-  }
 
   // Imposta una INQUADRATURA INIZIALE per la visualizzazione astronomica 3D
   function InitialFocus() {
@@ -437,13 +333,19 @@ export default function GalaxyMap({
       <InitialFocus />
 
       {/* Griglia di riferimento astronomico */}
-      <gridHelper args={[200, 20, "#333366", "#222244"]} position={[0, 0, 0]} />
+      <gridHelper args={[200, 20, "#444477", "#333355"]} position={[0, 0, 0]} />
       
-      {/* Sistema di illuminazione astronomica realistico */}
-      <ambientLight intensity={0.2} color="#0a0a2e" />
-      <pointLight position={[0, 0, 0]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[100, 100, 100]} intensity={0.3} color="#ffeeaa" />
-      <pointLight position={[-100, -100, -100]} intensity={0.3} color="#aaeeff" />
+      {/* 🔥 SISTEMA DI ILLUMINAZIONE MIGLIORATO PER EVITARE SCHERMO BIANCO */}
+      <ambientLight intensity={0.4} color="#1a1a3e" />
+      <pointLight position={[0, 0, 0]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[100, 100, 100]} intensity={0.6} color="#ffeeaa" />
+      <pointLight position={[-100, -100, -100]} intensity={0.6} color="#aaeeff" />
+      <directionalLight 
+        position={[50, 50, 50]} 
+        intensity={0.5} 
+        color="#ffffff"
+        castShadow={false}
+      />
       
       {/* Campo stellare galattico realistico */}
       <Stars 
