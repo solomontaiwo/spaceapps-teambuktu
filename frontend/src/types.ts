@@ -1,9 +1,16 @@
 export type Planet = {
   name: string;
-  radius: number;          // in raggi terrestri (scala visuale la gestiamo noi)
-  distance: number;        // in UA (scala visuale)
-  orbitalPeriod: number;   // in giorni
+  period: number;
+  radius: number;
+  eq_temp: number;
+  star_temp: number;
+  ra: number;
+  dec: number;
+  // Puoi lasciare altri campi come mass, distance, orbitalPeriod, color, ecc.
+  distance?: number;
+  orbitalPeriod?: number;
   color?: string;
+  mass?: number;
 };
 
 export type Star = {

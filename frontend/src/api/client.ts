@@ -1,32 +1,28 @@
-const API_BASE = "http://127.0.0.1:8000/api";
+const BASE_URL = "http://127.0.0.1:8000";
+const API = BASE_URL; // <-- togli /api
 
-// Helper per GET request
-export async function apiGet(path: string) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`GET ${path} failed: ${response.status}`);
+async function handle(res: Response) {
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} on ${res.url} – ${txt || res.statusText}`);
   }
-  return response.json();
+  return res.json();
 }
 
-// Helper per POST request
-export async function apiPost(path: string, data: any) {
-  const response = await fetch(`${API_BASE}${path}`, {
+export async function apiGet(path: string) {
+  const url = path.startsWith("/") ? `${API}${path}` : `${API}/${path}`;
+  const res = await fetch(url);
+  return handle(res);
+}
+
+export async function apiPost(path: string, body: any) {
+  const url = path.startsWith("/") ? `${API}${path}` : `${API}/${path}`;
+  const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
-  if (!response.ok) {
-    throw new Error(`POST ${path} failed: ${response.status}`);
-  }
-  return response.json();
+  return handle(res);
 }
 
 export async function getAllExoplanets() {
