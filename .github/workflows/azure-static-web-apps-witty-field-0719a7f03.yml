@@ -44,3 +44,5 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WITTY_FIELD_0719A7F03 }}
           action: "close"
+          app_location: "/frontend"
+          output_location: "dist"

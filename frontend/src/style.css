@@ -94,3 +94,23 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media (max-width: 800px) {
+  .hud-top,
+  .hud-bottom {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .hud-top > *,
+  .hud-bottom > * {
+    width: 90% !important;
+    text-align: center;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 16px !important;
+  }
+}

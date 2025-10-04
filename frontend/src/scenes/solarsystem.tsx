@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Planet from "./planet";
 import { useRef } from "react";
-import { Stars, } from "@react-three/drei";
+import { Stars } from "@react-three/drei";
 import type { System } from "../types";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -21,12 +21,17 @@ type Props = {
   system: System;
   selectedPlanetName?: string | null;
   onSelectPlanet?: (name: string) => void;
+  timeFlow?: number;
 };
 
-export default function SolarSystem({ system, selectedPlanetName, onSelectPlanet }: Props) {
+export default function SolarSystem({ system, selectedPlanetName, onSelectPlanet, timeFlow = 20 }: Props) {
   return (
     <div style={{ width: "100%", height: "100%" }}>
       <Canvas camera={{ position: [0, 3, 8] }}>
+        {/* Sfondo e nebbia */}
+        <color attach="background" args={["#02010A"]} />
+        <fog attach="fog" args={["#02010A", 15, 60]} />
+
         <ambientLight intensity={0.3} />
         <pointLight position={[0, 0, 0]} intensity={2} color="white" />
 
@@ -41,6 +46,7 @@ export default function SolarSystem({ system, selectedPlanetName, onSelectPlanet
           <Planet
             key={p.name}
             {...p}
+            timeFlow={timeFlow}
             onSelect={() => onSelectPlanet?.(p.name)}
             isSelected={selectedPlanetName === p.name}
           />
