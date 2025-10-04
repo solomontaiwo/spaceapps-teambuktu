@@ -36,6 +36,18 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
     });
   }
 
+  function addRandom() {
+    onInsert({
+      name: `New-${Math.floor(Math.random() * 10000)}`,
+      radius: 1 + Math.random() * 3,
+      period: 5 + Math.random() * 400,
+      eq_temp: 300 + Math.random() * 1500,
+      star_temp: 5000 + Math.random() * 1500,
+      ra: Math.random() * 360,
+      dec: Math.random() * 180 - 90,
+    });
+  }
+
   return (
     <div style={{ position: "absolute", bottom: 20, left: 20, zIndex: 20 }} {...(slot ? { slot } : {})}>
       {!open ? (
