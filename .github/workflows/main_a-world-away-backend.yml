@@ -39,8 +39,11 @@ jobs:
         with:
           name: python-app
           path: |
-            backend
-            !venv/
+            backend.zip
+
+      - name: Create backend zip
+        run: |
+          zip -r backend.zip backend -x "*/venv/*"
 
   deploy:
     runs-on: ubuntu-latest
@@ -69,4 +72,5 @@ jobs:
         with:
           app-name: 'a-world-away-backend'
           slot-name: 'Production'
-          package: './backend'
+          package: './backend.zip'
+
