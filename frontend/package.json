@@ -9,13 +9,16 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/react-dom": "^19.2.0",
     "typescript": "~5.9.3",
     "vite": "^7.1.7"
   },
   "dependencies": {
+    "@react-spring/three": "^10.0.3",
     "@react-three/cannon": "^6.6.0",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
+    "react-dom": "^19.2.0",
     "three": "^0.180.0"
   }
 }
