@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from db import SessionLocal
 from models import Planet
+from utils.db import get_all_planets
 
 router = APIRouter(prefix="/planets", tags=["Planets"])
 
@@ -15,7 +16,7 @@ def get_db():
         db.close()
 
 
-# 📄 GET /planets — ritorna lista di pianeti con filtro opzionale
+# 📄 GET /planets/ — ritorna lista di pianeti con filtro opzionale
 @router.get("/")
 def get_planets(
     db: Session = Depends(get_db),
@@ -29,7 +30,7 @@ def get_planets(
     return results
 
 
-# 📄 POST /planets — aggiunge un nuovo pianeta
+# 📄 POST /planets/ — aggiunge un nuovo pianeta
 @router.post("/")
 def add_planet(planet: dict, db: Session = Depends(get_db)):
     new_planet = Planet(**planet)
@@ -37,3 +38,10 @@ def add_planet(planet: dict, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_planet)
     return {"message": "✅ Pianeta aggiunto con successo", "planet": new_planet}
+
+
+# (Opzionale) GET /planets/all — ritorna tutti i pianeti dal CSV
+@router.get("/all")
+def get_planets_all():
+    planets = get_all_planets()
+    return planets
