@@ -35,38 +35,20 @@ function ExoPlanet({
   const meshRef = useRef<THREE.Mesh>(null);
   const orbitRef = useRef<THREE.Group>(null);
 
-  // 🌍 Posizionamento 3D REALISTICO con distanze logaritmiche
+  // 🌍 Posizionamento 3D COMPLETAMENTE RANDOM su TUTTA la griglia
   const position = useMemo(() => {
-    const ra = planet.ra || Math.random() * 360;
-    const dec = planet.dec || (Math.random() - 0.5) * 180;
+    // 🎲 DISTRIBUZIONE UNIFORME su TUTTA la superficie disponibile
+    const gridWidth = 1500;   // Larghezza totale griglia
+    const gridHeight = 150;   // Altezza totale griglia  
+    const gridDepth = 800;    // Profondità griglia
     
-    // 🚀 Distanza realistica basata su magnitudine stellare stimata
-    // Stelle più calde e grandi sono più luminose = sembrano più vicine
-    const starTemp = planet.star_temp || 5000;
-    const planetRadius = planet.radius || planet.koi_prad || 1;
-    
-    // Stima distanza basata su temperatura stellare (più calde = più luminose = più lontane per stessa magnitudine)
-    let estimatedDistance;
-    if (starTemp > 6000) estimatedDistance = 50 + Math.random() * 200; // Stelle calde, lontane
-    else if (starTemp > 5000) estimatedDistance = 30 + Math.random() * 150; // Stelle tipo sole
-    else estimatedDistance = 20 + Math.random() * 100; // Stelle fredde, vicine
-    
-    // 📏 Scala logaritmica REALISTICA per le distanze astronomiche
-    const dist = planet.sy_dist || estimatedDistance;
-    
-    // Conversione coordinate sferiche -> cartesiane
-    const phi = THREE.MathUtils.degToRad(90 - dec);
-    const theta = THREE.MathUtils.degToRad(ra);
-    
-    // 🌌 Scala logaritmica per distribuzione realistica
-    const r = Math.log10(dist + 1) * 25; // scala logaritmica più ampia
-
+    // 🌌 POSIZIONE COMPLETAMENTE CASUALE in tutto lo spazio
     return new THREE.Vector3(
-      r * Math.sin(phi) * Math.cos(theta),
-      r * Math.cos(phi),
-      r * Math.sin(phi) * Math.sin(theta)
+      (Math.random() - 0.5) * gridWidth,    // Random da -750 a +750
+      (Math.random() - 0.5) * gridHeight,   // Random da -75 a +75  
+      (Math.random() - 0.5) * gridDepth     // Random da -400 a +400
     );
-  }, [planet.ra, planet.dec, planet.sy_dist, planet.star_temp, planet.radius, planet.koi_prad]);
+  }, [planet.name]); // Usa il nome per posizione stabile
 
   // 🎨 Colore REALISTICO basato sulla temperatura del backend
   const planetColor = useMemo(() => {
@@ -87,33 +69,33 @@ function ExoPlanet({
     return "#673ab7"; // Ultra-torrido (viola scuro)
   }, [planet.eq_temp, planet.koi_teq]);
 
-  // 📏 Raggio REALISTICO del pianeta in scala astronomica
+  // 📏 Raggio REALISTICO del pianeta in scala astronomica PIÙ GRANDE
   const radius = useMemo(() => {
     // Usa il raggio dal backend (già in raggi terrestri)
     const earthRadii = planet.radius || planet.koi_prad || 1;
     
-    // 🌍 Scala realistica basata sui raggi terrestri
+    // 🌍 Scala realistica AMPLIFICATA per migliore visibilità
     let visualRadius;
     
     if (earthRadii < 0.5) {
-      // Sub-Terre (come Marte: 0.53 R⊕)
-      visualRadius = 0.15 + earthRadii * 0.2;
+      // Sub-Terre (come Marte: 0.53 R⊕) - PIÙ GRANDI
+      visualRadius = 0.4 + earthRadii * 0.6;
     } else if (earthRadii < 1.5) {
-      // Pianeti terrestri (0.5-1.5 R⊕)
-      visualRadius = 0.2 + earthRadii * 0.3;
+      // Pianeti terrestri (0.5-1.5 R⊕) - PIÙ GRANDI
+      visualRadius = 0.6 + earthRadii * 0.8;
     } else if (earthRadii < 4) {
-      // Super-Terre (1.5-4 R⊕)
-      visualRadius = 0.4 + earthRadii * 0.4;
+      // Super-Terre (1.5-4 R⊕) - PIÙ GRANDI
+      visualRadius = 1.0 + earthRadii * 0.6;
     } else if (earthRadii < 10) {
-      // Nettuniani (4-10 R⊕, come Nettuno: 3.88 R⊕)
-      visualRadius = 0.8 + earthRadii * 0.3;
+      // Nettuniani (4-10 R⊕, come Nettuno: 3.88 R⊕) - PIÙ GRANDI
+      visualRadius = 2.0 + earthRadii * 0.5;
     } else {
-      // Giganti gassosi (>10 R⊕, come Giove: 11.2 R⊕)
-      visualRadius = 2.0 + Math.log10(earthRadii) * 1.5;
+      // Giganti gassosi (>10 R⊕, come Giove: 11.2 R⊕) - PIÙ GRANDI
+      visualRadius = 4.0 + Math.log10(earthRadii) * 2.0;
     }
     
-    // Limita le dimensioni per la visualizzazione
-    return Math.max(0.1, Math.min(4.0, visualRadius));
+    // Limiti ampliati per migliore visibilità
+    return Math.max(0.3, Math.min(8.0, visualRadius));
   }, [planet.radius, planet.koi_prad]);
 
   // 🔄 Animazione orbitale
@@ -146,11 +128,33 @@ function ExoPlanet({
         <sphereGeometry args={[radius, 16, 16]} />
         <meshStandardMaterial
           color={planetColor}
-          emissive={isSelected ? planetColor : "#000000"}
-          emissiveIntensity={isSelected ? 0.4 : 0.1}
+          emissive={planetColor}              // 🎨 Emissive SEMPRE attivo per colori visibili
+          emissiveIntensity={isSelected ? 0.6 : 0.3} // 🔥 Più intenso se selezionato, ma sempre visibile
           roughness={earthRadii > 4 ? 0.3 : 0.7}  // 🌟 Giganti gassosi più lisci
           metalness={earthRadii < 1.5 ? 0.2 : 0.05} // 🪨 Pianeti rocciosi più metallici
         />
+        
+        {/* 🪐 ORBITA VISIBILE - anello intorno al pianeta */}
+        <mesh position={[0, 0, 0]}>
+          <ringGeometry args={[radius * 3, radius * 3.5, 64]} />
+          <meshBasicMaterial
+            color="#444444"
+            transparent
+            opacity={0.3}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        
+        {/* 🌟 Alone luminoso per migliore visibilità */}
+        <mesh position={[0, 0, 0]}>
+          <sphereGeometry args={[radius * 1.2, 8, 8]} />
+          <meshBasicMaterial
+            color={planetColor}
+            transparent
+            opacity={0.2}
+            side={THREE.BackSide}
+          />
+        </mesh>
         
         {/* Anello di selezione con info tipo pianeta */}
         {isSelected && (
@@ -202,15 +206,15 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({ planets, selected, onSelect, time
       <pointLight position={[200, 200, 200]} intensity={0.6} color="#ffeeaa" />
       <pointLight position={[-200, -200, -200]} intensity={0.6} color="#aaeeff" />
 
-      {/* 🌌 Griglia di riferimento astronomica estesa */}
-      <gridHelper args={[500, 50, "#444477", "#333355"]} position={[0, 0, 0]} />
+      {/* 🌌 Griglia di riferimento astronomica MASSIMA ESTENSIONE */}
+      <gridHelper args={[1500, 150, "#444477", "#333355"]} position={[0, 0, 0]} />
       
-      {/* 🌟 Campo stellare */}
+      {/* 🌟 Campo stellare galattico MASSIMA ESTENSIONE */}
       <Stars 
-        radius={3000} 
-        depth={1000} 
-        count={20000} 
-        factor={6} 
+        radius={8000}           // 🚀 Campo stellare ESTREMAMENTE esteso
+        depth={3000}            // 🌟 Profondità massima per effetto 3D
+        count={30000}           // ⭐ MOLTE PIÙ STELLE per coprire lo spazio
+        factor={8}              // 🔥 Stelle luminose
         fade 
         speed={0.1}
       />
