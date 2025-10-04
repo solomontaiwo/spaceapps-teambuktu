@@ -76,20 +76,27 @@ export default function App() {
             timeFlow={timeFlow}
           />
 
-            <HUD>
-            <SystemSelector
-              systems={systems}
-              index={sysIndex}
-              onChange={(i) => {
-              setSysIndex(i);
-              setSelectedPlanet(null);
-              }}
-            />
-            <SearchBar onSearch={setSearchQuery} />
-
-            <InsertPlanet onInsert={handleInsert} />
-            <TimeBar time={timeFlow} onChange={setTimeFlow} />
-            </HUD>
+          <HUD
+            top={
+              <>
+                <SystemSelector
+                  systems={systems}
+                  index={sysIndex}
+                  onChange={(i) => {
+                    setSysIndex(i);
+                    setSelectedPlanet(null);
+                  }}
+                />
+                <SearchBar onSearch={setSearchQuery} />
+              </>
+            }
+            bottom={
+              <>
+                <InsertPlanet onInsert={handleInsert} />
+                <TimeBar time={timeFlow} onChange={setTimeFlow} />
+              </>
+            }
+          />
 
           {selectedPlanet && (
             <InfoPanel

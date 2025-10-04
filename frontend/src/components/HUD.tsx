@@ -1,6 +1,11 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
-export default function HUD({ children }: { children: ReactNode }) {
+interface HUDProps {
+  top?: ReactNode;
+  bottom?: ReactNode;
+}
+
+export default function HUD({ top, bottom }: HUDProps) {
   return (
     <div
       style={{
@@ -9,7 +14,7 @@ export default function HUD({ children }: { children: ReactNode }) {
         left: 0,
         width: "100%",
         height: "100%",
-        pointerEvents: "none", // non blocca il canvas
+        pointerEvents: "none",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -28,9 +33,7 @@ export default function HUD({ children }: { children: ReactNode }) {
           pointerEvents: "auto",
         }}
       >
-        {children &&
-          Array.isArray(children) &&
-          children.filter((c: any) => c?.props?.slot === "top")}
+        {top}
       </div>
 
       <div
@@ -44,9 +47,7 @@ export default function HUD({ children }: { children: ReactNode }) {
           pointerEvents: "auto",
         }}
       >
-        {children &&
-          Array.isArray(children) &&
-          children.filter((c: any) => c?.props?.slot === "bottom")}
+        {bottom}
       </div>
     </div>
   );
