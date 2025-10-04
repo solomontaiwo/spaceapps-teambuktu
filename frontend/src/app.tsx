@@ -1,111 +1,74 @@
 import { useEffect, useState } from "react";
-import SolarSystem from "./scenes/solarsystem";
-import SystemSelector from "./components/SystemSelector";
-import InfoPanel from "./components/InfoPanel";
-import InsertPlanet from "./components/InsertPlanet";
+import GalaxyMap from "./scenes/GalaxyMap";
+import HUD from "./components/HUD";
 import SearchBar from "./components/SearchBar";
 import TimeBar from "./components/TimeBar";
-import Loader from "./components/Loader";
-import HUD from "./components/HUD";
-import { getAllExoplanets } from "./api/exoplanets";
-import type { System, Planet } from "./types";
+import InfoPanel from "./components/InfoPanel";
+import InsertPlanet from "./components/InsertPlanet";
 
 export default function App() {
-  const [systems, setSystems] = useState<System[]>([]);
-  const [sysIndex, setSysIndex] = useState(0);
-  const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
+  const [planets, setPlanets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPlanet, setSelectedPlanet] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFlow, setTimeFlow] = useState(20);
 
   useEffect(() => {
-    getAllExoplanets().then((systems: System[]) => {
-      setSystems(systems);
-      setLoading(false);
-    });
+    fetch("http://127.0.0.1:8000/planets")
+      .then((res) => res.json())
+      .then((data) => {
+        // distribuzione galattica 3D
+        const normalized = data.slice(0, 300).map((p: any, i: number) => ({
+          ...p,
+          radius: Math.max(0.3, (p.radius ?? 1) / 3),
+          color: `hsl(${(i * 47) % 360}, 70%, 55%)`,
+          x: (Math.random() - 0.5) * 200,
+          y: (Math.random() - 0.5) * 40,
+          z: (Math.random() - 0.5) * 200,
+        }));
+        setPlanets(normalized);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  function handleInsert(p: Planet) {
-    setSystems((systems) => {
-      const updated = [...systems];
-      if (updated[sysIndex]) {
-        updated[sysIndex] = {
-          ...updated[sysIndex],
-          planets: [...updated[sysIndex].planets, p],
-        };
-      }
-      return updated;
-    });
+  function handleInsert(newPlanet: any) {
+    setPlanets((prev) => [...prev, newPlanet]);
   }
 
-  const system = systems[sysIndex];
+  const filtered = searchQuery
+    ? planets.filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : planets;
 
-  const searchedPlanet =
-    searchQuery && system
-      ? system.planets.find((p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : null;
-
-  useEffect(() => {
-    if (searchedPlanet) setSelectedPlanet(searchedPlanet);
-    else setSelectedPlanet(null);
-  }, [searchedPlanet, sysIndex]);
+  if (loading)
+    return <div style={{ color: "white" }}>🛰 Loading exoplanets...</div>;
 
   return (
     <div
       style={{
         width: "100vw",
         height: "100vh",
-        overflow: "hidden",
         background: "black",
+        position: "relative",
       }}
     >
-      {loading || !system ? (
-        <Loader />
-      ) : (
-        <>
-          <SolarSystem
-            system={system}
-            selectedPlanetName={selectedPlanet?.name ?? null}
-            onSelectPlanet={(name) => {
-              const p =
-                system.planets.find((pl) => pl.name === name) || null;
-              setSelectedPlanet(p);
-            }}
-            timeFlow={timeFlow}
-          />
+      <GalaxyMap
+        planets={filtered}
+        timeFlow={timeFlow}
+        onSelect={setSelectedPlanet}
+        selected={selectedPlanet}
+      />
 
-          <HUD
-            top={
-              <>
-                <SystemSelector
-                  systems={systems}
-                  index={sysIndex}
-                  onChange={(i) => {
-                    setSysIndex(i);
-                    setSelectedPlanet(null);
-                  }}
-                />
-                <SearchBar onSearch={setSearchQuery} />
-              </>
-            }
-            bottom={
-              <>
-                <InsertPlanet onInsert={handleInsert} />
-                <TimeBar time={timeFlow} onChange={setTimeFlow} />
-              </>
-            }
-          />
+      <HUD>
+        <SearchBar slot="top" onSearch={setSearchQuery} />
+        <InsertPlanet slot="bottom-left" onInsert={handleInsert} />
+        <TimeBar slot="bottom-right" time={timeFlow} onChange={setTimeFlow} />
+      </HUD>
 
-          {selectedPlanet && (
-            <InfoPanel
-              star={system.star}
-              planet={selectedPlanet}
-              onClose={() => setSelectedPlanet(null)}
-            />
-          )}
-        </>
+      {selectedPlanet && (
+        <InfoPanel planet={selectedPlanet} onClose={() => setSelectedPlanet(null)} />
       )}
     </div>
   );

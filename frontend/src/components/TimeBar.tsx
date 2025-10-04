@@ -1,15 +1,25 @@
-type Props = {
+type TimeBarProps = {
   time: number;
-  onChange: (val: number) => void;
+  onChange: (value: number) => void;
+  slot?: string; // <--- AGGIUNTO
 };
 
-export default function TimeBar({ time, onChange }: Props) {
+export default function TimeBar({ time, onChange, slot }: TimeBarProps) {
   return (
-    <div style={{
-      position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-      zIndex: 20, background: "rgba(0,0,20,0.7)", padding: "6px 10px", borderRadius: 10,
-      color: "white"
-    }}>
+    <div
+      style={{
+        position: "absolute",
+        bottom: 20,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 20,
+        background: "rgba(0,0,20,0.7)",
+        padding: "6px 10px",
+        borderRadius: 10,
+        color: "white",
+      }}
+      {...(slot ? { slot } : {})}
+    >
       <label>⏱ Time flow: </label>
       <input
         type="range"

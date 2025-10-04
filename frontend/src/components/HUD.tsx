@@ -1,11 +1,23 @@
-import React, { ReactNode } from "react";
+import { ReactNode, Children } from "react";
 
-interface HUDProps {
-  top?: ReactNode;
-  bottom?: ReactNode;
-}
+type HUDProps = {
+  children: ReactNode;
+};
 
-export default function HUD({ top, bottom }: HUDProps) {
+export default function HUD({ children }: HUDProps) {
+  // Permette di gestire anche singolo child
+  const allChildren = Children.toArray(children) as any[];
+
+  const topChildren = allChildren.filter(
+    (child) => child?.props?.slot === "top"
+  );
+  const bottomLeftChildren = allChildren.filter(
+    (child) => child?.props?.slot === "bottom-left"
+  );
+  const bottomRightChildren = allChildren.filter(
+    (child) => child?.props?.slot === "bottom-right"
+  );
+
   return (
     <div
       style={{
@@ -14,40 +26,41 @@ export default function HUD({ top, bottom }: HUDProps) {
         left: 0,
         width: "100%",
         height: "100%",
-        pointerEvents: "none",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        pointerEvents: "none",
         padding: "10px",
         boxSizing: "border-box",
       }}
     >
+      {/* Sezione superiore */}
       <div
-        className="hud-top"
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "center",
           alignItems: "flex-start",
-          gap: "8px",
+          gap: "10px",
           flexWrap: "wrap",
           pointerEvents: "auto",
         }}
       >
-        {top}
+        {topChildren}
       </div>
 
+      {/* Sezione inferiore */}
       <div
-        className="hud-bottom"
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          gap: "8px",
+          gap: "10px",
           flexWrap: "wrap",
           pointerEvents: "auto",
         }}
       >
-        {bottom}
+        <div>{bottomLeftChildren}</div>
+        <div>{bottomRightChildren}</div>
       </div>
     </div>
   );

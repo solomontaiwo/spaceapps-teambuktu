@@ -1,13 +1,13 @@
 import { useState } from "react";
-import type { Planet } from "../types";
 
-type Props = {
-  onInsert: (planet: Planet) => void;
+type InsertPlanetProps = {
+  onInsert: (planet: any) => void;
+  slot?: string; // <--- AGGIUNTO
 };
 
-export default function InsertPlanet({ onInsert }: Props) {
+export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<Planet>({
+  const [form, setForm] = useState({
     name: "",
     radius: 1,
     distance: 1,
@@ -37,7 +37,7 @@ export default function InsertPlanet({ onInsert }: Props) {
   }
 
   return (
-    <div style={{ position: "absolute", bottom: 20, left: 20, zIndex: 20 }}>
+    <div style={{ position: "absolute", bottom: 20, left: 20, zIndex: 20 }} {...(slot ? { slot } : {})}>
       {!open ? (
         <button
           onClick={() => setOpen(true)}
@@ -75,7 +75,7 @@ export default function InsertPlanet({ onInsert }: Props) {
               name={f}
               placeholder={f}
               type={f === "name" ? "text" : "number"}
-              value={form[f as keyof Planet]}
+              value={form[f as keyof typeof form]}
               onChange={handleChange}
               style={{
                 width: "100%",

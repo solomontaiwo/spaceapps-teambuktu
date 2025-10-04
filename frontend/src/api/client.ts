@@ -1,18 +1,21 @@
-const BASE_URL = "https://a-world-away-backend.azurewebsites.net";
+const BASE_URL = "http://127.0.0.1:8000";
 
-export async function apiGet(endpoint: string) {
-  const baseUrl = "https://a-world-away-backend.azurewebsites.net";
-  const response = await fetch(`${baseUrl}${endpoint}`);
-  if (!response.ok) throw new Error("Errore API");
-  return response.json();
+export async function getAllExoplanets() {
+  const response = await fetch(`${BASE_URL}/planets`);
+  if (!response.ok) {
+    throw new Error("Errore nel caricamento dei pianeti");
+  }
+  return await response.json();
 }
 
-export async function apiPost(endpoint: string, body: any) {
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+export async function addExoplanet(planet: any) {
+  const response = await fetch(`${BASE_URL}/planets`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(planet),
   });
-  if (!response.ok) throw new Error("API error");
-  return response.json();
+  if (!response.ok) {
+    throw new Error("Errore nell'inserimento del pianeta");
+  }
+  return await response.json();
 }
