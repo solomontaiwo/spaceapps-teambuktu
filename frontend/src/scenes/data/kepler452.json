@@ -1,0 +1,16 @@
+{
+  "star": {
+    "name": "Kepler-452",
+    "radius": 1.11,
+    "temperature": 5757
+  },
+  "planets": [
+    {
+      "name": "Kepler-452b",
+      "radius": 1.6,
+      "distance": 1.05,
+      "orbitalPeriod": 385,
+      "color": "#5ec8f8"
+    }
+  ]
+}
