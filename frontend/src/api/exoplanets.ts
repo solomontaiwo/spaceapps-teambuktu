@@ -1,14 +1,13 @@
 import { apiGet } from "./client";
 import keplerData from "../scenes/data/kepler452.json";
+import type { System, Planet } from "../types";
 
-// Usa MOCK = true per testare senza backend
 const USE_MOCK = true;
 
-export async function getAllExoplanets() {
+export async function getAllExoplanets(): Promise<System[]> {
   if (USE_MOCK) {
-    // ritorna un array finto di sistemi/pianeti
-    return [
-      keplerData,
+    const systems: System[] = [
+      keplerData as System,
       {
         star: { name: "TRAPPIST-1", radius: 0.12, temperature: 2559 },
         planets: [
@@ -23,21 +22,19 @@ export async function getAllExoplanets() {
         ]
       }
     ];
+    return systems;
   }
-
-  // chiamata reale al backend (una volta attivo)
   return apiGet("/planets");
 }
 
-export async function getPlanetByName(name: string) {
+export async function getPlanetByName(name: string): Promise<Planet | null> {
   if (USE_MOCK) {
     const all = await getAllExoplanets();
-    for (const system of all) {
-      const found = system.planets.find((p: any) => p.name === name);
+    for (const s of all) {
+      const found = s.planets.find(p => p.name.toLowerCase() === name.toLowerCase());
       if (found) return found;
     }
     return null;
   }
-
   return apiGet(`/planets/${encodeURIComponent(name)}`);
 }

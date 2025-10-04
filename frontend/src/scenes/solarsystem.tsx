@@ -1,98 +1,54 @@
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, Stars } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import Planet from "./planet";
-import keplerData from "./data/kepler452.json";
-import { useState, useEffect } from "react";
-import { useSpring, a } from "@react-spring/three";
+import { useRef } from "react";
+import { Stars, } from "@react-three/drei";
+import type { System } from "../types";
+import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 
-function CameraController({ targetPosition }: { targetPosition: [number, number, number] }) {
-  const { camera } = useThree();
-  const { position } = useSpring({
-    position: targetPosition,
-    config: { mass: 1, tension: 90, friction: 20 },
-  });
-
-  useEffect(() => {
-    camera.lookAt(0, 0, 0);
-  }, [camera]);
-
-  return <a.perspectiveCamera position={position} />;
+function AnimatedStars() {
+  const g = useRef<THREE.Group>(null!);
+  useFrame((_, d) => { if (g.current) g.current.rotation.y += d * 0.02; });
+  return (
+    <group ref={g}>
+      <Stars radius={100} depth={60} count={7000} factor={4} fade />
+    </group>
+  );
 }
 
-export default function SolarSystem() {
-  const [selectedPlanet, setSelectedPlanet] = useState<any>(null);
+type Props = {
+  system: System;
+  selectedPlanetName?: string | null;
+  onSelectPlanet?: (name: string) => void;
+};
 
-  const targetPosition: [number, number, number] = selectedPlanet
-    ? [selectedPlanet.distance * 1.5, 2, selectedPlanet.distance * 1.5]
-    : [0, 3, 8];
-
+export default function SolarSystem({ system, selectedPlanetName, onSelectPlanet }: Props) {
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
-      <Canvas>
-        {/* Camera animata */}
-        <CameraController targetPosition={targetPosition} />
-
-        {/* Luci */}
+    <div style={{ width: "100%", height: "100%" }}>
+      <Canvas camera={{ position: [0, 3, 8] }}>
         <ambientLight intensity={0.3} />
         <pointLight position={[0, 0, 0]} intensity={2} color="white" />
 
-        {/* Stella */}
+        {/* Star */}
         <mesh>
           <sphereGeometry args={[0.5, 64, 64]} />
-          <meshStandardMaterial emissive={"#ffffcc"} color={"#fff6c0"} />
+          <meshBasicMaterial color={"#fff6c0"} />
         </mesh>
 
-        {/* Pianeti */}
-        {keplerData.planets.map((p: any) => (
+        {/* Planets */}
+        {system.planets.map(p => (
           <Planet
             key={p.name}
             {...p}
-            onSelect={() => setSelectedPlanet(p)}
-            isSelected={selectedPlanet?.name === p.name}
+            onSelect={() => onSelectPlanet?.(p.name)}
+            isSelected={selectedPlanetName === p.name}
           />
         ))}
 
-        {/* Sfondo stellato */}
-        <Stars radius={100} depth={50} count={5000} factor={4} fade />
-
-        {/* Controlli camera */}
+        <AnimatedStars />
         <OrbitControls enableZoom enablePan />
       </Canvas>
-
-      {/* Pannello informativo */}
-      {selectedPlanet && (
-        <div
-          style={{
-            position: "absolute",
-            top: 20,
-            right: 20,
-            padding: 16,
-            borderRadius: 12,
-            background: "rgba(0,0,0,0.7)",
-            color: "white",
-            width: "260px",
-          }}
-        >
-          <h3>{selectedPlanet.name}</h3>
-          <p><b>Raggio:</b> {selectedPlanet.radius} x Terra</p>
-          <p><b>Distanza orbitale:</b> {selectedPlanet.distance} UA</p>
-          <p><b>Periodo orbitale:</b> {selectedPlanet.orbitalPeriod} giorni</p>
-          <button
-            onClick={() => setSelectedPlanet(null)}
-            style={{
-              marginTop: 8,
-              padding: "4px 10px",
-              background: "crimson",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
-          >
-            Torna indietro
-          </button>
-        </div>
-      )}
     </div>
   );
 }
