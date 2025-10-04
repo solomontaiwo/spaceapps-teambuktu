@@ -33,6 +33,14 @@ jobs:
         run: pip install -r backend/requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Create backend zip
+        run: |
+          zip -r backend.zip backend -x "*/venv/*"
+
+      - name: List files (debug)
+        run: |
+          ls -al .
+          ls -al backend || true
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -40,10 +48,6 @@ jobs:
           name: python-app
           path: |
             backend.zip
-
-      - name: Create backend zip
-        run: |
-          zip -r backend.zip backend -x "*/venv/*"
 
   deploy:
     runs-on: ubuntu-latest
