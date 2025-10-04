@@ -30,9 +30,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
+        run: pip install -r backend/requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -41,7 +39,7 @@ jobs:
         with:
           name: python-app
           path: |
-            .
+            backend
             !venv/
 
   deploy:
@@ -70,4 +68,4 @@ jobs:
         with:
           app-name: 'a-world-away-backend'
           slot-name: 'Production'
-          
+          package: './backend'
