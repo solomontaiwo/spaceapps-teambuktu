@@ -1,4 +1,4 @@
-import SolarSystem from "./scenes/solarsystem";
+
 
 export default function App() {
   return (
@@ -7,3 +7,5 @@ export default function App() {
     </>
   );
 }
+import React from "react";
+import SolarSystem from "./scenes/solarsystem";

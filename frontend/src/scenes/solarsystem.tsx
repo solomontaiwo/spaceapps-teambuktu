@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
-import Planet from "./src/scenes/planet.tsx";
+import Planet from "./planet";
 import keplerData from "./data/kepler452.json";
 
 export default function SolarSystem() {
@@ -14,7 +14,7 @@ export default function SolarSystem() {
         {/* Stella */}
         <mesh>
           <sphereGeometry args={[0.5, 64, 64]} />
-          <meshStandardMaterial emissive={"#ffffcc"} color={"#fff6c0"} />
+          <meshBasicMaterial color={"#fff6c0"} />
         </mesh>
 
         {/* Pianeti */}
