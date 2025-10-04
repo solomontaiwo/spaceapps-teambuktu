@@ -6,11 +6,11 @@ import InsertPlanet from "./components/InsertPlanet";
 import SearchBar from "./components/SearchBar";
 import TimeBar from "./components/TimeBar";
 import Loader from "./components/Loader";
+import HUD from "./components/HUD";
 import { getAllExoplanets } from "./api/exoplanets";
 import type { System, Planet } from "./types";
 
 export default function App() {
-  // 🌌 Stati principali
   const [systems, setSystems] = useState<System[]>([]);
   const [sysIndex, setSysIndex] = useState(0);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
@@ -18,7 +18,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFlow, setTimeFlow] = useState(20);
 
-  // 🚀 Carica i pianeti dal backend (dataset eso.csv)
   useEffect(() => {
     getAllExoplanets().then((systems: System[]) => {
       setSystems(systems);
@@ -26,7 +25,6 @@ export default function App() {
     });
   }, []);
 
-  // ➕ Aggiunta manuale di un pianeta
   function handleInsert(p: Planet) {
     setSystems((systems) => {
       const updated = [...systems];
@@ -42,7 +40,6 @@ export default function App() {
 
   const system = systems[sysIndex];
 
-  // 🔍 Ricerca pianeta
   const searchedPlanet =
     searchQuery && system
       ? system.planets.find((p) =>
@@ -50,13 +47,11 @@ export default function App() {
         )
       : null;
 
-  // Quando cambia ricerca → aggiorna il pianeta selezionato
   useEffect(() => {
     if (searchedPlanet) setSelectedPlanet(searchedPlanet);
     else setSelectedPlanet(null);
   }, [searchedPlanet, sysIndex]);
 
-  // 🧠 Render
   return (
     <div
       style={{
@@ -70,26 +65,6 @@ export default function App() {
         <Loader />
       ) : (
         <>
-          {/* 🔍 Barra di ricerca */}
-          <SearchBar onSearch={setSearchQuery} />
-
-          {/* ☀️ Selettore sistema */}
-          <SystemSelector
-            systems={systems}
-            index={sysIndex}
-            onChange={(i) => {
-              setSysIndex(i);
-              setSelectedPlanet(null);
-            }}
-          />
-
-          {/* 🪐 Inserimento manuale */}
-          <InsertPlanet onInsert={handleInsert} />
-
-          {/* ⏱️ Barra del tempo per la velocità orbitale */}
-          <TimeBar time={timeFlow} onChange={setTimeFlow} />
-
-          {/* 🌌 Scena 3D */}
           <SolarSystem
             system={system}
             selectedPlanetName={selectedPlanet?.name ?? null}
@@ -101,7 +76,21 @@ export default function App() {
             timeFlow={timeFlow}
           />
 
-          {/* 🧾 Info pianeta selezionato */}
+            <HUD>
+            <SystemSelector
+              systems={systems}
+              index={sysIndex}
+              onChange={(i) => {
+              setSysIndex(i);
+              setSelectedPlanet(null);
+              }}
+            />
+            <SearchBar onSearch={setSearchQuery} />
+
+            <InsertPlanet onInsert={handleInsert} />
+            <TimeBar time={timeFlow} onChange={setTimeFlow} />
+            </HUD>
+
           {selectedPlanet && (
             <InfoPanel
               star={system.star}
