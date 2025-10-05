@@ -4,6 +4,7 @@ import InfoPanel from "./components/InfoPanel";
 import SearchBar from "./components/SearchBar";
 import InsertPlanet from "./components/InsertPlanet";
 import HUD from "./components/HUD";
+import GalaxyLoadingScreen from "./components/GalaxyLoadingScreen";
 
 import { getAllExoplanets } from "./api";
 import type { Planet } from "./types";
@@ -26,6 +27,7 @@ export default function App() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
+  const [fadeIn, setFadeIn] = useState(false);
   
   // 🚀 useRef per evitare doppio caricamento da StrictMode
   const hasLoaded = useRef(false);
@@ -109,7 +111,11 @@ export default function App() {
         setPlanets(testPlanets);
       } finally {
         if (isMounted) {
-          setLoading(false);
+          // Aggiungi un piccolo delay per mostrare il loading
+          setTimeout(() => {
+            setLoading(false);
+            setTimeout(() => setFadeIn(true), 100);
+          }, 1500); // 1.5 secondi minimo di loading
         }
       }
     };
@@ -122,7 +128,7 @@ export default function App() {
     };
   }, []); // Dependency array vuoto = carica solo una volta
 
-  if (loading) return <div style={{ color: "white" }}>Loading galaxy...</div>;
+  if (loading) return <GalaxyLoadingScreen />;
 
   return (
     <div
@@ -131,6 +137,8 @@ export default function App() {
         height: "100vh",
         background: "black",
         overflow: "hidden",
+        opacity: fadeIn ? 1 : 0,
+        transition: "opacity 1s ease-in-out"
       }}
     >
       <GalaxyMap
