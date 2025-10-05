@@ -27,42 +27,42 @@ export function calculatePlanetSize(backendRadius: number): PlanetSizeInfo {
     category = "Pianeta nano";
     description = "Oggetto planetario molto piccolo";
     realWorldComparison = "Più piccolo di Mercurio";
-    visualRadius = 0.6 + earthRadii * 2.5;  // 🚀 Molto più grande per visibilità
+    visualRadius = 1.2 + earthRadii * 3.0;  // 🚀 MOLTO più grande per visibilità mobile
   } else if (earthRadii < 0.8) {
     category = "Pianeta terrestre piccolo";
     description = "Pianeta roccioso compatto";
     realWorldComparison = "Simile a Marte (0.53 R⊕)";
-    visualRadius = 0.8 + earthRadii * 2.0;  // 🚀 Aumentato per visibilità
+    visualRadius = 1.5 + earthRadii * 2.5;  // 🚀 Aumentato per visibilità mobile
   } else if (earthRadii < 1.3) {
     category = "Pianeta terrestre";
     description = "Pianeta roccioso simile alla Terra";
     realWorldComparison = earthRadii > 1.0 ? "Simile a Venere (0.95 R⊕)" : "Simile alla Terra (1.0 R⊕)";
-    visualRadius = 1.0 + earthRadii * 1.5;  // 🚀 Aumentato per visibilità
+    visualRadius = 2.0 + earthRadii * 2.0;  // 🚀 Aumentato per visibilità mobile
   } else if (earthRadii < 2.5) {
     category = "Super-Terra";
     description = "Pianeta roccioso più grande della Terra";
     realWorldComparison = "Pianeta roccioso massiccio";
-    visualRadius = 1.5 + earthRadii * 1.2;  // 🚀 Aumentato per visibilità
+    visualRadius = 2.5 + earthRadii * 1.8;  // 🚀 Aumentato per visibilità mobile
   } else if (earthRadii < 6.0) {
     category = "Mini-Nettuno";
     description = "Pianeta con atmosfera spessa";
     realWorldComparison = "Pianeta gassoso piccolo";
-    visualRadius = 2.0 + earthRadii * 0.8;  // 🚀 Aumentato per visibilità
+    visualRadius = 3.0 + earthRadii * 1.2;  // 🚀 Aumentato per visibilità mobile
   } else if (earthRadii < 15.0) {
     category = "Gigante ghiacciato";
     description = "Pianeta gassoso tipo Nettuno";
     realWorldComparison = `Simile a Nettuno (3.88 R⊕) o Urano (4.01 R⊕)`;
-    visualRadius = 3.0 + earthRadii * 0.5;  // 🚀 Aumentato per visibilità
+    visualRadius = 4.0 + earthRadii * 0.8;  // 🚀 Aumentato per visibilità mobile
   } else {
     category = "Gigante gassoso";
     description = "Pianeta massiccio tipo Giove";
     realWorldComparison = earthRadii > 20 ? "Più grande di Giove (11.2 R⊕)" : "Simile a Giove";
-    visualRadius = 5.0 + Math.log10(earthRadii / 10) * 3.5;  // 🚀 Aumentato per visibilità
+    visualRadius = 6.0 + Math.log10(earthRadii / 10) * 4.0;  // 🚀 Aumentato per visibilità mobile
   }
 
-  // 🚀 SCALA FINALE AUMENTATA per migliore visibilità nella galassia
-  const scaleFactor = 1.8;  // Aumentato da 0.8 a 1.8
-  const finalRadius = Math.max(0.5, Math.min(12.0, visualRadius * scaleFactor));  // Range più ampio
+  // 🚀 SCALA FINALE MOLTO AUMENTATA per ottima visibilità mobile
+  const scaleFactor = 3.5;  // Aumentato da 1.8 a 3.5 per mobile
+  const finalRadius = Math.max(1.5, Math.min(20.0, visualRadius * scaleFactor));  // Range molto più ampio
 
   return {
     earthRadii,

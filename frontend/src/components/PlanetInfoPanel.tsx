@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { calculatePlanetSize, getPlanetCategoryColor, earthRadiiToKm, isInHabitableZone } from '../utils/planetSizeCalculations';
+import { predictExoplanet, PredictionResult } from '../api/predictions';
 import './PlanetInfoPanel.css';
 
 // Original fields from KOI_cleaned.csv for more details
@@ -32,6 +33,35 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   onCompareWithEarth,
   onClose
 }) => {
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 🤖 Funzione per predire se è un HEXAPLANET
+  const handlePredictHexaplanet = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const result = await predictExoplanet({
+        name: planet.name,
+        period: planet.period || planet.koi_period,
+        radius: planet.radius || planet.koi_prad,
+        eq_temp: planet.eq_temp || planet.koi_teq,
+        star_temp: planet.koi_steff,
+        star_radius: planet.koi_srad,
+        ra: planet.ra,
+        dec: planet.dec
+      });
+      
+      setPrediction(result);
+    } catch (err) {
+      console.error('Errore predizione AI:', err);
+      setError('🤖 Sistema AI temporaneamente non disponibile. Il nostro team di scienziati sta calibrando i telescopi!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Utilizza i nuovi calcoli delle dimensioni planetarie
   const planetRadius = planet.radius || planet.koi_prad || 1;
   const planetTemp = planet.eq_temp || planet.koi_teq || 300;
@@ -172,7 +202,138 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
         )}
       </div>
       
-      {onCompareWithEarth && (
+      {/* 🤖 SEZIONE PREDIZIONE ML - Solo per CANDIDATI */}
+      {planet.koi_disposition === 'CANDIDATE' && (
+        <div style={{ 
+          marginTop: "1rem", 
+          padding: "0.8rem", 
+          background: "rgba(255,255,255,0.1)", 
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.2)"
+        }}>
+          <h3 style={{ 
+            fontSize: "0.9rem", 
+            color: "#ffeb3b", 
+            marginBottom: "0.8rem",
+            textAlign: "center"
+          }}>
+            🤖 HEXAPLANET AI ANALYSIS
+          </h3>
+          
+          {!prediction && !error && (
+            <button 
+              onClick={handlePredictHexaplanet}
+              disabled={isLoading}
+              style={{
+                width: "100%",
+                padding: "0.8rem",
+                background: isLoading ? "#666" : "linear-gradient(90deg, #ff9800, #f57c00)",
+                border: "none",
+                borderRadius: "6px",
+                color: "white",
+                fontWeight: "bold",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                fontSize: "0.9rem",
+                transition: "all 0.3s ease"
+              }}
+            >
+              {isLoading ? "🔄 ANALYZING..." : "🚀 CONFRONTA HEXAPLANET"}
+            </button>
+          )}
+          
+          {error && (
+            <div style={{ 
+              color: "#ff5252", 
+              fontSize: "0.8rem", 
+              textAlign: "center",
+              padding: "0.5rem",
+              background: "rgba(255,82,82,0.1)",
+              borderRadius: "4px"
+            }}>
+              ❌ {error}
+              <button
+                onClick={() => setError(null)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #ff5252",
+                  color: "#ff5252",
+                  borderRadius: "3px",
+                  padding: "0.2rem 0.5rem",
+                  cursor: "pointer",
+                  fontSize: "0.7rem",
+                  marginLeft: "0.5rem"
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          
+          {prediction && (
+            <div style={{ textAlign: "center" }}>
+              <div style={{ 
+                background: prediction.is_exoplanet 
+                  ? "linear-gradient(90deg, #4caf50, #388e3c)" 
+                  : "linear-gradient(90deg, #f44336, #d32f2f)",
+                color: "white",
+                padding: "0.8rem",
+                borderRadius: "6px",
+                marginBottom: "0.8rem",
+                fontWeight: "bold",
+                fontSize: "1rem"
+              }}>
+                {prediction.is_exoplanet ? "✅ HEXAPLANET" : "❌ FALSE POSITIVE"}
+              </div>
+              
+              <div style={{ 
+                fontSize: "0.85rem", 
+                marginBottom: "0.8rem",
+                color: "#e0e0e0"
+              }}>
+                <strong>Confidence:</strong> {(prediction.confidence * 100).toFixed(1)}%
+              </div>
+              
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  onClick={() => setPrediction(null)}
+                  style={{
+                    flex: 1,
+                    background: "transparent",
+                    color: "#4dabf7",
+                    border: "1px solid #4dabf7",
+                    borderRadius: "4px",
+                    padding: "0.4rem",
+                    cursor: "pointer",
+                    fontSize: "0.8rem"
+                  }}
+                >
+                  🔄 New Analysis
+                </button>
+                {onCompareWithEarth && (
+                  <button
+                    onClick={onCompareWithEarth}
+                    style={{
+                      flex: 1,
+                      background: "transparent",
+                      color: "#81c784",
+                      border: "1px solid #81c784",
+                      borderRadius: "4px",
+                      padding: "0.4rem",
+                      cursor: "pointer",
+                      fontSize: "0.8rem"
+                    }}
+                  >
+                    🌍 vs Earth
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 🌍 Pulsante confronto Terra - Solo se NON è CANDIDATE o predizione completata */}
+      {(planet.koi_disposition !== 'CANDIDATE' || prediction) && onCompareWithEarth && (
         <button onClick={onCompareWithEarth} className="compare-btn">
           🌍 Confronta con la Terra
         </button>

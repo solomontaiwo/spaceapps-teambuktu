@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import { predictExoplanet, PredictionResult } from "../api/predictions";
 
 interface InfoPanelProps {
   planet: any;
@@ -7,6 +8,42 @@ interface InfoPanelProps {
 
 export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 🤖 Funzione per fare la predizione ML
+  const handlePredict = async () => {
+    if (!planet || planet.koi_disposition !== 'CANDIDATE') return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const result = await predictExoplanet({
+        name: planet.name,
+        period: planet.period,
+        radius: planet.radius,
+        eq_temp: planet.eq_temp,
+        star_temp: planet.star_temp,
+        star_radius: planet.star_radius,
+        ra: planet.ra,
+        dec: planet.dec
+      });
+      
+      setPrediction(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore predizione');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset prediction when planet changes
+  useEffect(() => {
+    setPrediction(null);
+    setError(null);
+  }, [planet]);
 
   // Gestisci click outside per chiudere il pannello
   useEffect(() => {
@@ -83,7 +120,85 @@ export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
           RA: {planet.ra ? planet.ra.toFixed(2) : "?"}°, DEC:{" "}
           {planet.dec ? planet.dec.toFixed(2) : "?"}°
         </p>
+        
+        {/* 🔍 Status del pianeta */}
+        <p>
+          <strong>Status:</strong>{" "}
+          <span style={{ 
+            color: planet.koi_disposition === 'CANDIDATE' ? '#ffffff' : 
+                   planet.koi_disposition === 'CONFIRMED' ? '#4dabf7' : '#888'
+          }}>
+            {planet.koi_disposition || 'UNKNOWN'}
+          </span>
+        </p>
       </div>
+
+      {/* 🤖 SEZIONE PREDIZIONE ML - Solo per CANDIDATI */}
+      {planet.koi_disposition === 'CANDIDATE' && (
+        <div style={{ marginTop: "1rem", padding: "0.8rem", background: "rgba(255,255,255,0.1)", borderRadius: "5px" }}>
+          <h3 style={{ fontSize: "1rem", color: "#ffeb3b", marginBottom: "0.5rem" }}>
+            🤖 AI Prediction
+          </h3>
+          
+          {!prediction && !error && (
+            <button
+              onClick={handlePredict}
+              disabled={isLoading}
+              style={{
+                background: isLoading ? "#666" : "#ff9800",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                padding: "0.5rem 1rem",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                fontWeight: "bold",
+                width: "100%",
+                fontSize: "0.9rem"
+              }}
+            >
+              {isLoading ? "🔄 Analyzing..." : "🚀 Predict HEXAPLANET"}
+            </button>
+          )}
+          
+          {error && (
+            <div style={{ color: "#ff5252", fontSize: "0.8rem", marginTop: "0.5rem" }}>
+              ❌ {error}
+            </div>
+          )}
+          
+          {prediction && (
+            <div style={{ fontSize: "0.85rem", lineHeight: "1.3" }}>
+              <div style={{ 
+                background: prediction.is_exoplanet ? "#4caf50" : "#f44336",
+                color: "white",
+                padding: "0.4rem 0.6rem",
+                borderRadius: "3px",
+                marginBottom: "0.5rem",
+                fontWeight: "bold",
+                textAlign: "center"
+              }}>
+                {prediction.prediction_class}
+              </div>
+              <p><strong>Confidence:</strong> {(prediction.confidence * 100).toFixed(1)}%</p>
+              <button
+                onClick={() => setPrediction(null)}
+                style={{
+                  background: "transparent",
+                  color: "#4dabf7",
+                  border: "1px solid #4dabf7",
+                  borderRadius: "3px",
+                  padding: "0.2rem 0.5rem",
+                  cursor: "pointer",
+                  fontSize: "0.7rem",
+                  marginTop: "0.3rem"
+                }}
+              >
+                🔄 New Prediction
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <button
         onClick={() =>
