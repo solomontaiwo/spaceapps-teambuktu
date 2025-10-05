@@ -1,11 +1,11 @@
 export type Planet = {
   name: string;
-  period: number;
-  radius: number;
-  eq_temp: number;
-  star_temp: number;
-  ra: number;
-  dec: number;
+  period?: number;
+  radius?: number;
+  eq_temp?: number;
+  star_temp?: number;
+  ra?: number;
+  dec?: number;
   // Puoi lasciare altri campi come mass, distance, orbitalPeriod, color, ecc.
   distance?: number;
   orbitalPeriod?: number;
