@@ -1,23 +1,45 @@
 import React from 'react';
-import { PLANET_TYPE_COLORS, PLANET_TYPE_LABELS } from '../utils/planetInfo';
+import { calculatePlanetSize, getPlanetCategoryColor, earthRadiiToKm, isInHabitableZone } from '../utils/planetSizeCalculations';
 import './PlanetInfoPanel.css';
 
+interface PlanetData {
+  id: string;
+  name: string;
+  radius: number;          // Dal backend per compatibilità frontend
+  period: number;          // Dal backend per compatibilità frontend
+  eq_temp: number;         // Dal backend per compatibilità frontend
+  // Campi originali dal KOI_cleaned.csv per maggiori dettagli
+  koi_disposition?: string;
+  koi_prad?: number;
+  koi_period?: number;
+  koi_teq?: number;
+  koi_steff?: number;
+  koi_srad?: number;
+  ra?: number;
+  dec?: number;
+  source?: string;
+}
+
 interface PlanetInfoPanelProps {
-  planet: any;
-  classification: any;
+  planet: PlanetData;
   onCompareWithEarth?: () => void;
   onClose?: () => void;
 }
 
 const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   planet,
-  classification,
   onCompareWithEarth,
   onClose
 }) => {
-  const temp = planet.eq_temp || planet.koi_teq || 300;
-  const radius = planet.radius || planet.koi_prad || 1;
-  const isHabitable = temp >= 273 && temp <= 320 && radius < 3;
+  // Utilizza i nuovi calcoli delle dimensioni planetarie
+  const planetRadius = planet.radius || planet.koi_prad || 1;
+  const planetTemp = planet.eq_temp || planet.koi_teq || 300;
+  const planetPeriod = planet.period || planet.koi_period;
+  
+  const sizeInfo = calculatePlanetSize(planetRadius);
+  const categoryColor = getPlanetCategoryColor(planetRadius);
+  const planetKm = earthRadiiToKm(planetRadius);
+  const isHabitable = isInHabitableZone(planetRadius, planetTemp);
   
   return (
     <div className="planet-info-panel">
@@ -29,23 +51,28 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
       <div className="planet-type">
         <div 
           className="type-badge"
-          style={{ 
-            backgroundColor: PLANET_TYPE_COLORS[classification.type as keyof typeof PLANET_TYPE_COLORS] || '#666'
-          }}
+          style={{ backgroundColor: categoryColor }}
         >
-          {PLANET_TYPE_LABELS[classification.type as keyof typeof PLANET_TYPE_LABELS] || 'Sconosciuto'}
+          {sizeInfo.category}
         </div>
+        {planet.koi_disposition && (
+          <div className="disposition-badge">
+            Status: {planet.koi_disposition}
+          </div>
+        )}
       </div>
       
       <div className="planet-stats">
         <div className="stat">
           <span className="label">🌡️ Temperatura:</span>
-          <span className="value">{temp.toFixed(0)}K ({(temp - 273).toFixed(0)}°C)</span>
+          <span className="value">{planetTemp.toFixed(0)}K ({(planetTemp - 273).toFixed(0)}°C)</span>
         </div>
         
         <div className="stat">
           <span className="label">📏 Dimensioni:</span>
-          <span className="value">{radius.toFixed(1)}× Terra</span>
+          <span className="value">
+            {sizeInfo.earthRadii.toFixed(2)}× Terra ({planetKm.toFixed(0)} km)
+          </span>
         </div>
         
         <div className="stat">
@@ -55,64 +82,93 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
           </span>
         </div>
         
-        {planet.period && (
+        {planetPeriod && (
           <div className="stat">
             <span className="label">🗓️ Periodo Orbitale:</span>
-            <span className="value">{planet.period.toFixed(1)} giorni</span>
+            <span className="value">{planetPeriod.toFixed(1)} giorni</span>
           </div>
         )}
         
-        {planet.star_temp && (
+        {planet.koi_steff && (
           <div className="stat">
             <span className="label">⭐ Temperatura Stella:</span>
-            <span className="value">{planet.star_temp.toFixed(0)}K</span>
+            <span className="value">{planet.koi_steff.toFixed(0)}K</span>
+          </div>
+        )}
+        
+        {planet.koi_srad && (
+          <div className="stat">
+            <span className="label">☀️ Raggio Stella:</span>
+            <span className="value">{planet.koi_srad.toFixed(2)}× Sole</span>
+          </div>
+        )}
+        
+        {planet.ra && planet.dec && (
+          <div className="stat">
+            <span className="label">🌌 Coordinate:</span>
+            <span className="value">RA: {planet.ra.toFixed(3)}°, Dec: {planet.dec.toFixed(3)}°</span>
           </div>
         )}
       </div>
       
       <div className="planet-description">
-        <h3>Caratteristiche Scientifiche:</h3>
+        <h3>Classificazione: {sizeInfo.category}</h3>
+        <p className="description">{sizeInfo.description}</p>
+        <p className="comparison">
+          <strong>Confronto:</strong> {sizeInfo.realWorldComparison}
+        </p>
+        
+        <h4>Caratteristiche Planetarie:</h4>
         <ul>
-          {classification.type === 'rocky' && (
+          {sizeInfo.category.includes('Pianeta terrestre') && (
             <>
-              <li>🪨 Superficie solida con possibili montagne e crateri</li>
-              <li>🏔️ Atmosfera sottile o assente</li>
-              <li>🌋 Possibile attività geologica</li>
+              <li>🪨 Superficie rocciosa solida</li>
+              <li>🏔️ Possibili catene montuose e crateri</li>
+              <li>� Potenziale attività geologica</li>
+              {isHabitable && <li>💧 Condizioni favorevoli per l'acqua liquida</li>}
             </>
           )}
           
-          {classification.type === 'gaseous' && (
+          {sizeInfo.category === 'Super-Terra' && (
             <>
-              <li>🌪️ Atmosfera densa di idrogeno ed elio</li>
-              <li>🌀 Tempeste atmosferiche gigantesche</li>
-              <li>💨 Possibili lune rocciose o ghiacciate</li>
+              <li>� Gravità superiore alla Terra</li>
+              <li>🛡️ Campo magnetico probabilmente forte</li>
+              <li>�️ Atmosfera potenzialmente densa</li>
+              {isHabitable && <li>🌊 Possibili oceani estesi</li>}
             </>
           )}
           
-          {classification.type === 'icy' && (
+          {sizeInfo.category === 'Mini-Nettuno' && (
             <>
-              <li>❄️ Superficie coperta di ghiacci</li>
-              <li>💎 Alta riflettività (albedo elevato)</li>
-              <li>🧊 Possibili oceani sotterranei</li>
+              <li>🌪️ Atmosfera spessa di idrogeno/elio</li>
+              <li>💎 Nucleo roccioso/ghiacciato</li>
+              <li>🌀 Possibili tempeste atmosferiche</li>
             </>
           )}
           
-          {classification.type === 'volcanic' && (
+          {sizeInfo.category.includes('Gigante') && (
             <>
-              <li>🌋 Intensa attività vulcanica</li>
-              <li>🔥 Superficie incandescente</li>
-              <li>💨 Atmosfera ricca di gas sulfurei</li>
+              <li>�️ Atmosfera massiccia e turbolenta</li>
+              <li>🪐 Possibili sistemi di anelli</li>
+              <li>🌙 Numerose lune satelliti</li>
+              <li>💨 Venti supersonici nell'atmosfera</li>
             </>
           )}
           
-          {classification.type === 'oceanic' && (
+          {sizeInfo.category === 'Pianeta nano' && (
             <>
-              <li>🌊 Oceani di acqua liquida</li>
-              <li>☁️ Ciclo dell'acqua attivo</li>
-              <li>🐠 Alto potenziale per la vita</li>
+              <li>�️ Superficie probabilmente rocciosa</li>
+              <li>🌬️ Atmosfera molto sottile o assente</li>
+              <li>❄️ Temperature estremamente fredde</li>
             </>
           )}
         </ul>
+        
+        {planet.source && (
+          <div className="data-source">
+            <small>📊 Fonte dati: {planet.source}</small>
+          </div>
+        )}
       </div>
       
       {onCompareWithEarth && (

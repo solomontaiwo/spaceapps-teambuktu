@@ -24,5 +24,4 @@ class Planet(BaseModel):
     ra: float | None = None
     dec: float | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

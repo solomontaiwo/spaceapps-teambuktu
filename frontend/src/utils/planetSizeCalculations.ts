@@ -1,6 +1,6 @@
 /**
  * Utilità per il calcolo e la visualizzazione accurata delle dimensioni planetarie
- * basate sui dati reali del backend
+ * basate sui dati reali del backend (campo koi_prad dal KOI_cleaned.csv)
  */
 
 export interface PlanetSizeInfo {
@@ -13,6 +13,7 @@ export interface PlanetSizeInfo {
 
 /**
  * Calcola le informazioni dettagliate sulla dimensione di un pianeta
+ * @param backendRadius - Raggio dal campo 'radius' o 'koi_prad' del backend
  */
 export function calculatePlanetSize(backendRadius: number): PlanetSizeInfo {
   const earthRadii = backendRadius || 1;
@@ -105,45 +106,67 @@ export function isInHabitableZone(earthRadii: number, temperature: number): bool
 
 /**
  * Genera statistiche di debug per verificare i dati del backend
+ * Aggiornato per il formato KOI_cleaned.csv
  */
 export function debugPlanetData(planets: any[]): void {
-  console.group("🔍 Debug Dati Planetari dal Backend");
+  console.group("🔍 Debug Dati Planetari dal Backend (KOI_cleaned.csv)");
   
-  const validPlanets = planets.filter(p => p.radius !== undefined && p.radius !== null);
-  const radii = validPlanets.map(p => p.radius!);
-  
-  console.log(`📊 Pianeti totali: ${planets.length}`);
-  console.log(`✅ Pianeti con dati di raggio: ${validPlanets.length}`);
-  console.log(`📏 Raggio minimo: ${Math.min(...radii).toFixed(2)} R⊕`);
-  console.log(`📏 Raggio massimo: ${Math.max(...radii).toFixed(2)} R⊕`);
-  console.log(`📏 Raggio medio: ${(radii.reduce((a, b) => a + b, 0) / radii.length).toFixed(2)} R⊕`);
-  
-  // Categorizzazione
-  const categories = {
-    "Pianeti nani": radii.filter(r => r < 0.3).length,
-    "Terrestri piccoli": radii.filter(r => r >= 0.3 && r < 0.8).length,
-    "Terrestri": radii.filter(r => r >= 0.8 && r < 1.3).length,
-    "Super-Terre": radii.filter(r => r >= 1.3 && r < 2.5).length,
-    "Mini-Nettuno": radii.filter(r => r >= 2.5 && r < 6.0).length,
-    "Giganti ghiacciati": radii.filter(r => r >= 6.0 && r < 15.0).length,
-    "Giganti gassosi": radii.filter(r => r >= 15.0).length,
-  };
-  
-  console.table(categories);
-  
-  // Campioni interessanti
-  const earthLike = validPlanets.filter(p => 
-    p.radius >= 0.8 && p.radius <= 1.3 && 
-    p.eq_temp && p.eq_temp >= 273 && p.eq_temp <= 320
+  // Verifica che i pianeti abbiano i campi corretti
+  const validPlanets = planets.filter(p => 
+    (p.radius !== undefined && p.radius !== null) || 
+    (p.koi_prad !== undefined && p.koi_prad !== null)
   );
   
-  console.log(`🌍 Pianeti potenzialmente abitabili: ${earthLike.length}`);
-  if (earthLike.length > 0) {
-    console.log("Esempi di pianeti abitabili:", earthLike.slice(0, 5).map(p => ({
-      nome: p.name,
-      raggio: `${p.radius.toFixed(2)} R⊕`,
-      temperatura: `${p.eq_temp.toFixed(1)} K`
-    })));
+  const radii = validPlanets.map(p => p.radius || p.koi_prad).filter(r => r > 0);
+  
+  console.log(`📊 Pianeti totali: ${planets.length}`);
+  console.log(`✅ Pianeti con dati di raggio validi: ${validPlanets.length}`);
+  
+  if (radii.length > 0) {
+    console.log(`📏 Raggio minimo: ${Math.min(...radii).toFixed(2)} R⊕`);
+    console.log(`📏 Raggio massimo: ${Math.max(...radii).toFixed(2)} R⊕`);
+    console.log(`📏 Raggio medio: ${(radii.reduce((a, b) => a + b, 0) / radii.length).toFixed(2)} R⊕`);
+    
+    // Categorizzazione aggiornata
+    const categories = {
+      "Pianeti nani": radii.filter(r => r < 0.3).length,
+      "Terrestri piccoli": radii.filter(r => r >= 0.3 && r < 0.8).length,
+      "Terrestri": radii.filter(r => r >= 0.8 && r < 1.3).length,
+      "Super-Terre": radii.filter(r => r >= 1.3 && r < 2.5).length,
+      "Mini-Nettuno": radii.filter(r => r >= 2.5 && r < 6.0).length,
+      "Giganti ghiacciati": radii.filter(r => r >= 6.0 && r < 15.0).length,
+      "Giganti gassosi": radii.filter(r => r >= 15.0).length,
+    };
+    
+    console.table(categories);
+    
+    // Verifica disposizioni (dal KOI_cleaned.csv)
+    const dispositions = {
+      "CONFIRMED": planets.filter(p => p.koi_disposition === "CONFIRMED").length,
+      "CANDIDATE": planets.filter(p => p.koi_disposition === "CANDIDATE").length,
+      "FALSE POSITIVE": planets.filter(p => p.koi_disposition === "FALSE POSITIVE").length,
+    };
+    
+    console.log(`📈 Disposizioni KOI:`);
+    console.table(dispositions);
+    
+    // Campioni interessanti con dati KOI
+    const earthLike = validPlanets.filter(p => {
+      const radius = p.radius || p.koi_prad;
+      const temp = p.eq_temp || p.koi_teq;
+      return radius >= 0.8 && radius <= 1.3 && 
+             temp && temp >= 273 && temp <= 320;
+    });
+    
+    console.log(`🌍 Pianeti potenzialmente abitabili: ${earthLike.length}`);
+    if (earthLike.length > 0) {
+      console.log("Esempi di pianeti abitabili:", earthLike.slice(0, 3).map(p => ({
+        nome: p.name,
+        raggio: `${(p.radius || p.koi_prad)?.toFixed(2)} R⊕`,
+        temperatura: `${(p.eq_temp || p.koi_teq)?.toFixed(1)} K`,
+        disposizione: p.koi_disposition
+      })));
+    }
   }
   
   console.groupEnd();
