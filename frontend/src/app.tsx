@@ -27,7 +27,7 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.koi_steff || 5000,
       ra: p.ra || Math.random() * 360,
       dec: p.dec || (Math.random() - 0.5) * 180,
-      koi_disposition: p.koi_disposition || 'CANDIDATE',
+      koi_disposition: p.koi_disposition, // ❌ NON forzare CANDIDATE!
     };
   } else {
     // CSV format (endpoint /planets/all)
@@ -39,7 +39,7 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.star_temp || 5000,
       ra: p.coordinates?.ra || Math.random() * 360,
       dec: p.coordinates?.dec || (Math.random() - 0.5) * 180,
-      koi_disposition: p.koi_disposition || 'CANDIDATE',
+      koi_disposition: p.koi_disposition, // ❌ NON forzare CANDIDATE!
     };
   }
 }

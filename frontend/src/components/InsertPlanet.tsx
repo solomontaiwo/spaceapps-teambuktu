@@ -119,10 +119,29 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
             🪐 Add New Exoplanet
           </h4>
           
+          {/* 📋 Suggerimenti scientifici */}
+          <div style={{
+            background: 'rgba(0, 100, 200, 0.1)',
+            border: '1px solid rgba(100, 150, 255, 0.3)',
+            borderRadius: '6px',
+            padding: '8px',
+            marginBottom: '12px',
+            fontSize: '11px',
+            color: '#b8d4ff'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#ffffff' }}>
+              💡 Scientific Tips:
+            </div>
+            <div>• <strong>Habitable Zone:</strong> 273-320K temperature range</div>
+            <div>• <strong>Rocky planets:</strong> 0.5-2.0 Earth radii</div>
+            <div>• <strong>Gas giants:</strong> 4+ Earth radii</div>
+            <div>• <strong>Hot Jupiters:</strong> Period &lt;10 days, high temp</div>
+          </div>
+          
           {/* Planet Name */}
           <input
             name="name"
-            placeholder="Planet Name (e.g. Kepler-452b)"
+            placeholder="e.g. Kepler-452b, TOI-1234b, HD-209458b"
             type="text"
             value={form.name}
             onChange={handleChange}
@@ -142,7 +161,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           {/* Planet Radius */}
           <input
             name="radius"
-            placeholder="Radius (Earth radii)"
+            placeholder="Earth=1.0, Jupiter=11.2, Neptune=3.9"
             type="number"
             step="0.1"
             min="0.1"
@@ -164,7 +183,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           {/* Orbital Period */}
           <input
             name="period"
-            placeholder="Orbital Period (days)"
+            placeholder="Earth=365, Mercury=88, Mars=687"
             type="number"
             step="0.1"
             min="0.1"
@@ -186,7 +205,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           {/* Planet Temperature */}
           <input
             name="eq_temp"
-            placeholder="Temperature (Kelvin)"
+            placeholder="Earth=288K, Venus=737K, Mars=210K"
             type="number"
             step="1"
             min="1"
@@ -208,7 +227,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           {/* Star Temperature */}
           <input
             name="star_temp"
-            placeholder="Star Temperature (Kelvin)"
+            placeholder="Sun=5778K, Red dwarf=3500K, Blue star=10000K"
             type="number"
             step="1"
             min="1000"
@@ -231,7 +250,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           <div style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
             <input
               name="ra"
-              placeholder="RA (degrees)"
+              placeholder="RA: 0-360°"
               type="number"
               step="0.1"
               min="0"
@@ -250,7 +269,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
             />
             <input
               name="dec"
-              placeholder="DEC (degrees)"
+              placeholder="DEC: -90 to +90°"
               type="number"
               step="0.1"
               min="-90"
@@ -270,25 +289,42 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           </div>
           
           {/* Disposition */}
-          <select
-            name="koi_disposition"
-            value={form.koi_disposition}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              marginBottom: 12,
-              borderRadius: 6,
-              border: "1px solid rgba(255,255,255,0.2)",
-              padding: "8px",
-              background: "rgba(255,255,255,0.1)",
-              color: "white",
-              fontSize: "14px"
-            }}
-          >
-            <option value="CANDIDATE" style={{background: '#2a2a2a'}}>CANDIDATE</option>
-            <option value="CONFIRMED" style={{background: '#2a2a2a'}}>CONFIRMED</option>
-            <option value="FALSE POSITIVE" style={{background: '#2a2a2a'}}>FALSE POSITIVE</option>
-          </select>
+          <div style={{ marginBottom: 8 }}>
+            <label style={{ 
+              fontSize: '12px', 
+              color: '#cccccc', 
+              marginBottom: '4px', 
+              display: 'block' 
+            }}>
+              🔍 Planet Classification:
+            </label>
+            <select
+              name="koi_disposition"
+              value={form.koi_disposition}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                marginBottom: 4,
+                borderRadius: 6,
+                border: "1px solid rgba(255,255,255,0.2)",
+                padding: "8px",
+                background: "rgba(255,255,255,0.1)",
+                color: "white",
+                fontSize: "14px"
+              }}
+            >
+              <option value="CANDIDATE" style={{background: '#2a2a2a'}}>CANDIDATE (⚪ White - Team Buktu findings)</option>
+              <option value="CONFIRMED" style={{background: '#2a2a2a'}}>CONFIRMED (🔵 Blue - Verified exoplanet)</option>
+              <option value="FALSE POSITIVE" style={{background: '#2a2a2a'}}>FALSE POSITIVE (⚫ Gray - Not a planet)</option>
+            </select>
+            <div style={{ 
+              fontSize: '10px', 
+              color: '#888888', 
+              fontStyle: 'italic' 
+            }}>
+              💡 CANDIDATE = Your discoveries that need verification
+            </div>
+          </div>
           
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
             <button 
