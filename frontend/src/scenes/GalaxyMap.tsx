@@ -3,6 +3,12 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Planet } from "../types"; // Usa il tipo corretto
+import { 
+  calculatePlanetSize, 
+  getPlanetCategoryColor, 
+  isInHabitableZone,
+  debugPlanetData 
+} from "../utils/planetSizeCalculations";
 
 // 🔬 Sistema di classificazione planetaria scientifica
 function classifyPlanet(temp: number, radius: number) {
@@ -101,12 +107,43 @@ function ExoPlanet({
     );
   }, [planet.name]); // Usa il nome per posizione stabile
 
-  // 🔬 Classificazione scientifica del pianeta
+  // � Calcolo REALISTICO delle dimensioni usando dati del backend
+  const planetSizeInfo = useMemo(() => {
+    const backendRadius = planet.radius || 1;
+    const sizeInfo = calculatePlanetSize(backendRadius);
+    
+    // Debug: stampa informazioni dettagliate per i primi pianeti
+    if (planet.name && Math.random() < 0.05) { // 5% di chance per non spam
+      console.log(`🪐 ${planet.name}:`, {
+        'Raggio backend': `${backendRadius.toFixed(2)} R⊕`,
+        'Categoria': sizeInfo.category,
+        'Raggio visuale': `${sizeInfo.visualRadius.toFixed(2)}`,
+        'Confronto': sizeInfo.realWorldComparison,
+        'Temperatura': planet.eq_temp ? `${planet.eq_temp.toFixed(1)} K` : 'N/A',
+        'Abitabile': isInHabitableZone(backendRadius, planet.eq_temp || 300) ? '✅' : '❌'
+      });
+    }
+    
+    return sizeInfo;
+  }, [planet.radius, planet.name, planet.eq_temp]);
+
+  // Usa il raggio calcolato dalle utilità
+  const radius = planetSizeInfo.visualRadius;
+
+  // �🔬 Classificazione scientifica del pianeta basata su dati reali
   const planetClassification = useMemo(() => {
     const temp = planet.eq_temp || 300;
     const earthRadii = planet.radius || 1;
-    return classifyPlanet(temp, earthRadii);
-  }, [planet.eq_temp, planet.radius]);
+    const classification = classifyPlanet(temp, earthRadii);
+    
+    // Migliora la classificazione con dati dal backend
+    return {
+      ...classification,
+      sizeCategory: planetSizeInfo.category,
+      isHabitable: isInHabitableZone(earthRadii, temp),
+      categoryColor: getPlanetCategoryColor(earthRadii)
+    };
+  }, [planet.eq_temp, planet.radius, planetSizeInfo]);
 
   // 🎨 Materiali ULTRA-REALISTICI direttamente dalla classificazione
   const planetMaterials = useMemo(() => {
@@ -128,36 +165,7 @@ function ExoPlanet({
     };
   }, [planetClassification, planet.radius]);
 
-  // 📏 Raggio REALISTICO del pianeta in scala astronomica PIÙ GRANDE
-  const radius = useMemo(() => {
-    // Usa il raggio dal backend (già in raggi terrestri)
-    const earthRadii = planet.radius || 1;
-    
-    // 🌍 Scala realistica AMPLIFICATA per migliore visibilità
-    let visualRadius;
-    
-    if (earthRadii < 0.5) {
-      // Sub-Terre (come Marte: 0.53 R⊕) - PIÙ GRANDI
-      visualRadius = 0.4 + earthRadii * 0.6;
-    } else if (earthRadii < 1.5) {
-      // Pianeti terrestri (0.5-1.5 R⊕) - PIÙ GRANDI
-      visualRadius = 0.6 + earthRadii * 0.8;
-    } else if (earthRadii < 4) {
-      // Super-Terre (1.5-4 R⊕) - PIÙ GRANDI
-      visualRadius = 1.0 + earthRadii * 0.6;
-    } else if (earthRadii < 10) {
-      // Nettuniani (4-10 R⊕, come Nettuno: 3.88 R⊕) - PIÙ GRANDI
-      visualRadius = 2.0 + earthRadii * 0.5;
-    } else {
-      // Giganti gassosi (>10 R⊕, come Giove: 11.2 R⊕) - PIÙ GRANDI
-      visualRadius = 4.0 + Math.log10(earthRadii) * 2.0;
-    }
-    
-    // Limiti ampliati per migliore visibilità
-    return Math.max(0.3, Math.min(8.0, visualRadius));
-  }, [planet.radius]);
-
-  // 🔄 Animazione REALISTICA di rotazione e orbita
+  //  Animazione REALISTICA di rotazione e orbita
   useFrame((_, delta) => {
     if (!meshRef.current || !orbitRef.current) return;
     
@@ -419,6 +427,13 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
 }) => {
   const controlsRef = useRef<any>(null);
   const filtered = useMemo(() => planets.slice(0, 200), [planets]);
+
+  // 🔍 Debug: mostra statistiche quando i pianeti cambiano
+  useEffect(() => {
+    if (planets.length > 0) {
+      debugPlanetData(planets);
+    }
+  }, [planets]);
 
   return (
     <Canvas 
