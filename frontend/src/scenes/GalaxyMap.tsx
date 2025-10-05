@@ -116,7 +116,7 @@ function ExoPlanet({
       atmosphereColor: planetClassification.atmosphereColor,
       roughness: planetClassification.roughness,
       metalness: planetClassification.metalness,
-      atmosphereOpacity: planet.radius > 1 ? 0.6 : 0.3,
+      atmosphereOpacity: (planet.radius ?? 1) > 1 ? 0.6 : 0.3,
       // Effetti speciali per ogni tipo
       hasSpecialEffects: {
         iceEffects: planetClassification.type === 'icy',
@@ -167,7 +167,7 @@ function ExoPlanet({
     meshRef.current.rotation.y += rotationSpeed * 0.1; // Rotazione realistica ma visibile
     
     // 🪐 MOVIMENTO ORBITALE (anno)
-    const orbitalPeriod = planet.period * 24; // giorni -> ore
+    const orbitalPeriod = (planet.period ?? 365) * 24; // giorni -> ore
     const orbitalSpeed = (timeFlow * delta) / (orbitalPeriod * 3600); // converti in secondi
     orbitRef.current.rotation.y += orbitalSpeed * 0.05; // Movimento orbitale più lento
     
