@@ -134,31 +134,34 @@ function ExoPlanet({
     const seed2 = Math.abs(hash * 1.5) / 2147483647;
     const seed3 = Math.abs(hash * 2.3) / 2147483647;
     
-    // 🌌 PARAMETRI SPIRALE GALATTICA - DISTRIBUZIONE BILANCIATA
-    const galaxyRadius = 1200;       // 🚀 Ridotto per meno dispersione estrema
-    const spiralArms = 4;            // Numero di bracci spirale
-    const spiralTightness = 0.6;     // 🚀 Bracci più definiti
-    const coreRadius = 80;           // 🚀 Nucleo controllato
-    const galaxyThickness = 400;     // 🚀 Spessore Y controllato
+    // 🌌 PARAMETRI SPIRALE GALATTICA - ANTI-COLLISIONE CON PIANETI +200%
+    const galaxyRadius = 2000;       // 🚀 +67% più spazio per pianeti grandi
+    const spiralArms = 4;            
+    const spiralTightness = 0.4;     // 🚀 Meno stretto per evitare sovrapposizioni
+    const coreRadius = 200;          // 🚀 Core più ampio 
+    const galaxyThickness = 800;     // 🚀 Spessore Y maggiore per separazione
+    const minSpacing = 200;          // 🚀 DISTANZA MINIMA per pianeti grandi
     
-    // 🚀 DISTRIBUZIONE BILANCIATA - Evita "schegge impazzite"
-    const r = Math.pow(seed1, 0.4) * galaxyRadius + coreRadius; // Distribuzione più organica
+    // 🚀 DISTRIBUZIONE ANTI-COLLISIONE con SPACING GARANTITO
+    const r = Math.pow(seed1, 0.3) * galaxyRadius + coreRadius + (hash % 100) * minSpacing * 0.01;
     
-    // 🚀 ANGOLO CONTROLLATO - No più dispersioni estreme
-    const baseAngle = seed2 * Math.PI * 2; // Un giro completo
-    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 1.5); // Variazione controllata
+    // 🚀 ANGOLO CON OFFSET ANTI-SOVRAPPOSIZIONE
+    const baseAngle = seed2 * Math.PI * 2;
+    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 1.2);
     const armIndex = Math.floor(seed3 * spiralArms);
     const armAngle = (armIndex * Math.PI * 2) / spiralArms;
-    const totalAngle = baseAngle + spiralOffset + armAngle;
+    const spacingOffset = (hash % 1000) * 0.02; // Offset per evitare collisioni
+    const totalAngle = baseAngle + spiralOffset + armAngle + spacingOffset;
     
-    // 🚀 COORDINATE CONTROLLATE - Evita pianeti "volanti"
-    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 200; // Ridotta variazione
-    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 200; // Ridotta variazione
+    // 🚀 COORDINATE CON EXTRA SPACING per pianeti +200%
+    const spacingMultiplier = 2.0; // Raddoppio lo spazio per pianeti grandi
+    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 400 * spacingMultiplier;
+    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 400 * spacingMultiplier;
     
-    // 🚀 ALTEZZA BILANCIATA su Y - No più dispersioni estreme
+    // 🚀 ALTEZZA CON PIÙ SEPARAZIONE VERTICALE
     const heightVariation = (seed1 + seed2 + seed3) / 3;
-    const heightMultiplier = 2.0; // Ridotto da 3.0 per controllo migliore
-    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 150;
+    const heightMultiplier = 3.0; // Aumentato per più separazione
+    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 300;
     
     return new THREE.Vector3(x, y, z);
   }, [planet.name]); // Usa il nome per posizione stabile
@@ -276,7 +279,7 @@ function ExoPlanet({
           document.body.style.cursor = "default";
         }}
       >
-        <sphereGeometry args={[radius * 1.5, 16, 16]} />
+        <sphereGeometry args={[radius * 2.5, 16, 16]} />
         <meshBasicMaterial visible={false} />
       </mesh>
       

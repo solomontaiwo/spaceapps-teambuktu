@@ -217,6 +217,7 @@ export default function App() {
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
         zoomToPlanet={zoomToPlanet}
+        useRealisticPlanets={false}
       />
 
       {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
