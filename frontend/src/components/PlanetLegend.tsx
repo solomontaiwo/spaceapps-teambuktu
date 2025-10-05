@@ -20,7 +20,7 @@ export default function PlanetLegend() {
     { 
       type: 'FALSE POSITIVE', 
       color: '#666666', 
-      description: 'Not Real Planets',
+      description: 'Not Real Exoplanets',
       icon: '❌'
     },
     { 
