@@ -11,6 +11,7 @@ export type FilterType =
 interface FilterDropdownProps {
   onFilterChange: (filter: FilterType) => void;
   currentFilter: FilterType;
+  slot?: string; // Prop opzionale per HUD
 }
 
 const filterLabels = {
@@ -47,9 +48,7 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
     <div
       ref={dropdownRef}
       style={{
-        position: "absolute",
-        top: 12,
-        right: 12,
+        position: "relative",
         zIndex: 1000,
       }}
     >

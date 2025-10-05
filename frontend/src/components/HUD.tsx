@@ -11,6 +11,9 @@ export default function HUD({ children }: HUDProps) {
   const topChildren = allChildren.filter(
     (child) => child?.props?.slot === "top"
   );
+  const topRightChildren = allChildren.filter(
+    (child) => child?.props?.slot === "top-right"
+  );
   const bottomLeftChildren = allChildren.filter(
     (child) => child?.props?.slot === "bottom-left"
   );
@@ -38,14 +41,21 @@ export default function HUD({ children }: HUDProps) {
       <div
         style={{
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "space-between",
           alignItems: "flex-start",
           gap: "10px",
           flexWrap: "wrap",
           pointerEvents: "auto",
         }}
       >
-        {topChildren}
+        {/* Top center */}
+        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          {topChildren}
+        </div>
+        {/* Top right */}
+        <div style={{ display: "flex", gap: "10px" }}>
+          {topRightChildren}
+        </div>
       </div>
 
       {/* Sezione inferiore */}
