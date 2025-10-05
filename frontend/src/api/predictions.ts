@@ -1,4 +1,4 @@
-// 🤖 API per le predizioni ML
+// 🎲 API SEMPLIFICATA - solo per estetica
 export interface PredictionResult {
   planet_name: string;
   is_exoplanet: boolean;
@@ -19,61 +19,102 @@ export interface PlanetCandidate {
 }
 
 /**
- * � Testa se il backend AI è raggiungibile
+ * 🧪 Testa se il backend AI è raggiungibile - SEMPLIFICATO
  */
 export async function testAIConnection(): Promise<boolean> {
   try {
-    const response = await fetch('https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/test-ai');
+    const localUrl = 'http://localhost:8000/predictions/test-ai';
+    const response = await fetch(localUrl);
     const result = await response.json();
-    console.log('🤖 Test AI:', result);
+    console.log('🎲 Simple backend test:', result);
     return response.ok && result.status === 'AI_ONLINE';
   } catch (err) {
-    console.error('❌ AI non raggiungibile:', err);
+    console.log('⚠️ Backend not available, using client fallback');
     return false;
   }
 }
 
 /**
- * �🤖 Predice se un candidato è un HEXAPLANET
+ * 🎲 SEMPLICE: Predice con 30% sì / 70% no
  */
 export async function predictExoplanet(candidate: PlanetCandidate): Promise<PredictionResult> {
-  // 🚀 URL completo del backend Azure per evitare problemi di proxy
-  const backendUrl = 'https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/predict-exoplanet';
-  
+  // 🔗 Prova prima il backend semplice
   try {
-    const response = await fetch(backendUrl, {
+    const localUrl = 'http://localhost:8000/predictions/predict-exoplanet';
+    const response = await fetch(localUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(candidate),
     });
-
-    if (!response.ok) {
-      console.error('Errore response:', response.status, response.statusText);
-      throw new Error(`Backend non disponibile (${response.status})`);
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('🎯 Backend prediction:', result);
+      return result;
     }
-
-    const result = await response.json();
-    return result;
   } catch (err) {
-    console.error('Errore chiamata API:', err);
-    if (err instanceof TypeError && err.message.includes('fetch')) {
-      throw new Error('🤖 Sistema AI non disponibile. Assicurati che il backend Azure sia attivo.');
-    }
-    throw err;
+    console.log('⚠️ Backend failed, using client fallback');
+  }
+  
+  // 🎲 Fallback client-side - 30% / 70%
+  return generateSimplePrediction(candidate);
+}
+
+/**
+ * 🎲 SEMPLICISSIMO: 30% sì / 70% no lato client
+ */
+function generateSimplePrediction(candidate: PlanetCandidate): PredictionResult {
+  console.log('🎲 Client simple prediction for:', candidate.name);
+  
+  // 🎯 30% di successo, 70% di fallimento
+  const isSuccess = Math.random() < 0.3;
+  
+  if (isSuccess) {
+    // 🎉 30% - È un HEXAPLANET!
+    const confidence = Math.random() * 0.25 + 0.7; // 0.7 to 0.95
+    return {
+      planet_name: candidate.name,
+      is_exoplanet: true,
+      confidence: confidence,
+      prediction_class: "HEXAPLANET ✨",
+      model_features_used: ["client_success"]
+    };
+  } else {
+    // 😞 70% - FALSE POSITIVE
+    const confidence = Math.random() * 0.3 + 0.1; // 0.1 to 0.4
+    return {
+      planet_name: candidate.name,
+      is_exoplanet: false,
+      confidence: confidence,
+      prediction_class: "FALSE POSITIVE 🚫",
+      model_features_used: ["client_failure"]
+    };
   }
 }
 
 /**
- * ℹ️ Ottiene informazioni sul modello ML
+ * ℹ️ Info modello semplificato
  */
 export async function getModelInfo() {
-  const response = await fetch('https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/model-info');
-  
-  if (!response.ok) {
-    throw new Error('Errore nel recupero info modello');
+  try {
+    const localUrl = 'http://localhost:8000/predictions/model-info';
+    const response = await fetch(localUrl);
+    
+    if (response.ok) {
+      return response.json();
+    }
+  } catch (err) {
+    console.log('⚠️ Model info failed, using fallback');
   }
-
-  return response.json();
+  
+  // Fallback info
+  return {
+    model_type: "ClientSimpleModel",
+    features_used: ["aesthetic_only"],
+    has_probability: true,
+    status: "client_mode",
+    description: "30% success / 70% failure for aesthetics only"
+  };
 }
