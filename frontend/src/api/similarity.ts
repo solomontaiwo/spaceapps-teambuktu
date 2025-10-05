@@ -1,7 +1,4 @@
 import { apiPost } from "./client";
-// If you get "Module './exoplanets' has no exported member 'Planet'", 
-// make sure 'Planet' is actually exported from './exoplanets'.
-// If not, you need to define or import the correct type.
 
 // If 'Planet' is not exported from './exoplanets', define the type here or import the correct type.
 // Example definition (replace with actual properties as needed):

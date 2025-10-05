@@ -2,7 +2,7 @@ const USE_MOCK = false;
 
 import { apiGet } from "./client";
 
-// 🚀 Cache separata per ogni endpoint
+// Cache separata per ogni endpoint
 let limitedPlanetsCache: any[] | null = null;
 let allPlanetsCache: any[] | null = null;
 let isLoadingLimited = false;
