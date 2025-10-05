@@ -24,11 +24,3 @@ export async function apiPost(path: string, body: any) {
   });
   return handle(res);
 }
-
-export async function getAllExoplanets() {
-  return await apiGet("/planets");
-}
-
-export async function addExoplanet(planet: any) {
-  return await apiPost("/planets", planet);
-}

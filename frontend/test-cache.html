@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Cache</title>
+</head>
+<body>
+    <h1>Test Cache Pianeti</h1>
+    <button onclick="testCache()">Test Cache</button>
+    <div id="output"></div>
+
+    <script>
+        // Simula la cache
+        let planetsCache = null;
+        let isLoading = false;
+        let loadingPromise = null;
+        let lastLoadTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+
+        async function mockApiCall() {
+            console.log("🌍 Chiamata API simulata...");
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simula delay
+            return Array.from({length: 7803}, (_, i) => ({id: i, name: `Planet-${i}`}));
+        }
+
+        async function getAllExoplanets() {
+            const now = Date.now();
+            
+            // Cache check
+            if (planetsCache && (now - lastLoadTime) < CACHE_DURATION) {
+                console.log("🚀 Usando cache pianeti:", planetsCache.length, "(cache valida)");
+                return Promise.resolve(planetsCache);
+            }
+
+            // Loading check
+            if (isLoading && loadingPromise) {
+                console.log("⏳ Aspettando caricamento già in corso...");
+                return loadingPromise;
+            }
+
+            // Start loading
+            isLoading = true;
+            console.log("🌍 Iniziando caricamento dal backend...");
+            
+            loadingPromise = (async () => {
+                try {
+                    const data = await mockApiCall();
+                    console.log("✅ Pianeti caricati dal backend:", data.length);
+                    
+                    planetsCache = data;
+                    lastLoadTime = now;
+                    
+                    return data;
+                } finally {
+                    isLoading = false;
+                    loadingPromise = null;
+                }
+            })();
+
+            return loadingPromise;
+        }
+
+        async function testCache() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Eseguendo test...</p>';
+            
+            // Simula StrictMode - doppia chiamata
+            console.log("=== TEST 1: Prima chiamata ===");
+            const promise1 = getAllExoplanets();
+            
+            console.log("=== TEST 2: Seconda chiamata immediata (StrictMode) ===");
+            const promise2 = getAllExoplanets();
+            
+            try {
+                const [result1, result2] = await Promise.all([promise1, promise2]);
+                
+                output.innerHTML = `
+                    <h3>Risultati:</h3>
+                    <p>Prima chiamata: ${result1.length} pianeti</p>
+                    <p>Seconda chiamata: ${result2.length} pianeti</p>
+                    <p>Stesso oggetto? ${result1 === result2 ? 'Sì (cache)' : 'No (duplicazione)'}</p>
+                    <p>Controlla la console per i log dettagliati!</p>
+                `;
+            } catch (error) {
+                output.innerHTML = `<p>Errore: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

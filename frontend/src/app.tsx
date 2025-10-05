@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import GalaxyMap from "./scenes/GalaxyMap";
 import TimeBar from "./components/TimeBar";
 import InfoPanel from "./components/InfoPanel";
@@ -7,7 +7,7 @@ import InsertPlanet from "./components/InsertPlanet";
 import HUD from "./components/HUD";
 
 import { getAllExoplanets } from "./api";
-import type { Planet } from "./types"; // Assicurati che il tipo sia corretto
+import type { Planet } from "./types";
 
 // Funzione di mapping CORRETTA per i dati del backend
 function mapBackendPlanet(p: any): Planet {
@@ -28,16 +28,36 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [timeFlow, setTimeFlow] = useState(200);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
+  
+  // 🚀 useRef per evitare doppio caricamento da StrictMode
+  const hasLoaded = useRef(false);
 
+  // 🚀 Ottimizzazione: carica i pianeti solo una volta
   useEffect(() => {
-    getAllExoplanets()
-      .then((data) => {
+    // Se abbiamo già caricato, non fare nulla (evita StrictMode double render)
+    if (hasLoaded.current) {
+      console.log("🚫 Caricamento già eseguito, skipping...");
+      return;
+    }
+    
+    let isMounted = true; // Evita state update se il componente è smontato
+
+    const loadPlanets = async () => {
+      try {
+        hasLoaded.current = true; // Marca come caricato PRIMA della chiamata API
+        
+        const data = await getAllExoplanets();
+        
+        if (!isMounted) return; // Evita state update se smontato
+        
         const mapped = data.map(mapBackendPlanet);
-        console.log("✅ Pianeti caricati dal backend:", mapped.length, mapped.slice(0, 3));
+        console.log("✅ Pianeti mappati per l'app:", mapped.length);
         setPlanets(mapped);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("❌ Errore caricamento pianeti:", err);
+        
+        if (!isMounted) return;
+        
         // 🚀 Pianeti di test se il backend non risponde
         const testPlanets: Planet[] = [
           {
@@ -89,9 +109,20 @@ export default function App() {
         
         console.log("🔄 Usando pianeti di test:", testPlanets.length);
         setPlanets(testPlanets);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadPlanets();
+
+    // Cleanup: evita memory leak
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Dependency array vuoto = carica solo una volta
 
   if (loading) return <div style={{ color: "white" }}>Loading galaxy...</div>;
 
