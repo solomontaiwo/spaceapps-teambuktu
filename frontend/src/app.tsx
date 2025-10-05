@@ -9,6 +9,7 @@ import HUD from "./components/HUD";
 import GalaxyLoadingScreen from "./components/GalaxyLoadingScreen";
 import PlanetLegend from "./components/PlanetLegend";
 import FilterDropdown, { FilterType } from "./components/FilterDropdown";
+import { MenuProvider } from "./contexts/MenuContext";
 
 import { getAllExoplanets, getLimitedExoplanets } from "./api";
 import type { Planet } from "./types";
@@ -199,19 +200,19 @@ export default function App() {
         background: "black",
         overflow: "hidden",
         opacity: fadeIn ? 1 : 0,
-        transition: "opacity 1s ease-in-out",
+        transition: "opacity 1s ease-in-out"
       }}
     >
       <GalaxyMap
         planets={filteredPlanets}
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
-        zoomToPlanet={zoomToPlanet}
       />
 
-      {/* Legenda e HUD nascosti se c'è un pianeta selezionato */}
+      {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
       <PlanetLegend hidden={selectedPlanet !== null} />
 
+      {/* HUD and controls - nascosto quando un pianeta è selezionato */}
       <HUD hidden={selectedPlanet !== null}>
         <SearchBar
           slot="top"

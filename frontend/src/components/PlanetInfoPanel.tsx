@@ -257,7 +257,7 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
                 transition: "all 0.3s ease"
               }}
             >
-              {isLoading ? "🔄 ANALYZING..." : "🚀 CONFRONTA HEXAPLANET"}
+              {isLoading ? "🔄 ANALYZING..." : "🚀 CONFRONTA ESOPLANET"}
             </button>
           )}
           
