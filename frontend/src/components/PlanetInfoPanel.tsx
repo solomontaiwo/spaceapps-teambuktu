@@ -2,6 +2,7 @@ import React from 'react';
 import { calculatePlanetSize, getPlanetCategoryColor, earthRadiiToKm, isInHabitableZone } from '../utils/planetSizeCalculations';
 import './PlanetInfoPanel.css';
 
+// Original fields from KOI_cleaned.csv for more details
 interface PlanetData {
   id: string;
   name: string;

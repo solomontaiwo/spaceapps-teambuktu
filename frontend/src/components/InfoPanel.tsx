@@ -1,15 +1,46 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
-export default function InfoPanel({ planet }: { planet: any }) {
+interface InfoPanelProps {
+  planet: any;
+  onClose?: () => void;
+}
+
+export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Gestisci click outside per chiudere il pannello
+  useEffect(() => {
+    function handleClickOutside(event: Event) {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node) && onClose) {
+        onClose();
+      }
+    }
+
+    if (planet && onClose) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside); // Supporto touch per mobile
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("touchstart", handleClickOutside);
+      };
+    }
+  }, [planet, onClose]);
+
   if (!planet) return null;
+
+  // Detecting mobile with window.innerWidth
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <div
+      ref={panelRef}
       style={{
         position: "absolute",
-        top: "1rem",
+        top: isMobile ? "auto" : "1rem",
+        bottom: isMobile ? "1rem" : "auto",
         right: "1rem",
-        width: "280px",
+        left: isMobile ? "1rem" : "auto",
+        width: isMobile ? "auto" : "280px",
         padding: "1rem",
         borderRadius: "10px",
         background: "rgba(0, 0, 0, 0.8)",

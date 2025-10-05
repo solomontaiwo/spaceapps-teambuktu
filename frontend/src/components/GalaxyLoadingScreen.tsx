@@ -64,7 +64,7 @@ const GalaxyLoadingScreen: React.FC = () => {
         opacity: 0.8
       }} />
       
-      {/* Pianeta centrale rotante */}
+      {/* Central rotating planet */}
       <div style={{
         width: '80px',
         height: '80px',
@@ -75,7 +75,7 @@ const GalaxyLoadingScreen: React.FC = () => {
         marginBottom: '30px',
         position: 'relative'
       }}>
-        {/* Anello del pianeta */}
+        {/* Planet ring */}
         <div style={{
           position: 'absolute',
           top: '50%',

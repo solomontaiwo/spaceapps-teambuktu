@@ -46,6 +46,7 @@ export default function HUD({ children }: HUDProps) {
           gap: "10px",
           flexWrap: "wrap",
           pointerEvents: "auto",
+          paddingRight: typeof window !== 'undefined' && window.innerWidth <= 768 ? "10px" : "300px", // Responsive padding
         }}
       >
         {/* Top center */}
