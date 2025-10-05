@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db import Base, engine
-from routers import planets, similarity  # ✅ includi anche similarity se serve
+from routers import planets, similarity, optimized_search  # ✅ incluso il nuovo router per ricerche ottimizzate
 
 app = FastAPI(title="A World Away - Exoplanet Backend", version="0.1.0")
 
@@ -20,8 +20,9 @@ app.add_middleware(
 # ✅ Registra i router con prefisso coerente
 app.include_router(planets.router, prefix="/api", tags=["Planets"])
 app.include_router(similarity.router, prefix="/api", tags=["Similarity"])
+app.include_router(optimized_search.router, prefix="/api", tags=["Optimized Search"])  # Nuovo router per ricerche ottimizzate
 
 # ✅ Rotta di test per verificare che il backend risponde
 @app.get("/")
 def root():
-    return {"status": "Backend attivo 🚀"}
+    return {"status": "Backend attivo 🚀 con ricerche ottimizzate"}
