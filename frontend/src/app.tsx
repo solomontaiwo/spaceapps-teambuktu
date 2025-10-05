@@ -224,6 +224,7 @@ export default function App() {
           }}
         />
         <FilterDropdown
+          slot="top-right"
           onFilterChange={setCurrentFilter}
           currentFilter={currentFilter}
         />
