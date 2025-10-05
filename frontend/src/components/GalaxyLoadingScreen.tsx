@@ -10,7 +10,7 @@ const GalaxyLoadingScreen: React.FC = () => {
     'Analyzing exoplanet data',
     'Calculating habitability zones',
     'Mapping stellar coordinates',
-    'Loading 7,803 worlds'
+    'Loading potential worlds'
   ];
 
   useEffect(() => {

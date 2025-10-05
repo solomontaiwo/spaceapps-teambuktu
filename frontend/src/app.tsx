@@ -5,22 +5,40 @@ import SearchBar from "./components/SearchBar";
 import InsertPlanet from "./components/InsertPlanet";
 import HUD from "./components/HUD";
 import GalaxyLoadingScreen from "./components/GalaxyLoadingScreen";
+import FilterDropdown, { FilterType } from "./components/FilterDropdown";
 
-import { getAllExoplanets } from "./api";
+import { getAllExoplanets, getLimitedExoplanets } from "./api";
 import type { Planet } from "./types";
+import { filterPlanets, getFilterInfo } from "./utils/planetFilters";
 
 // Funzione di mapping CORRETTA per i dati del backend
 function mapBackendPlanet(p: any): Planet {
-  return {
-    name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
-    period: p.period || 365,
-    radius: p.radius || 1,
-    eq_temp: p.eq_temp || 300,
-    star_temp: p.star_temp || 5000,
-    // Generiamo coordinate casuali per ogni pianeta
-    ra: Math.random() * 360,
-    dec: (Math.random() - 0.5) * 180,
-  };
+  // Gestisce sia i dati dal database (/planets/) che dal CSV (/planets/all)
+  const isDbFormat = p.koi_prad !== undefined; // I dati dal DB hanno koi_prad, quelli dal CSV hanno radius
+  
+  if (isDbFormat) {
+    // Formato dal database (endpoint /planets/)
+    return {
+      name: p.kepoi_name || `Planet-${p.id || Math.random().toString(36).substr(2, 9)}`,
+      period: p.koi_period || 365,
+      radius: p.koi_prad || 1,
+      eq_temp: p.koi_teq || 300,
+      star_temp: p.koi_steff || 5000,
+      ra: p.ra || Math.random() * 360,
+      dec: p.dec || (Math.random() - 0.5) * 180,
+    };
+  } else {
+    // Formato dal CSV (endpoint /planets/all)
+    return {
+      name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
+      period: p.period || 365,
+      radius: p.radius || 1,
+      eq_temp: p.eq_temp || 300,
+      star_temp: p.star_temp || 5000,
+      ra: p.coordinates?.ra || Math.random() * 360,
+      dec: p.coordinates?.dec || (Math.random() - 0.5) * 180,
+    };
+  }
 }
 
 export default function App() {
@@ -28,9 +46,13 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
   const [fadeIn, setFadeIn] = useState(false);
+  const [currentFilter, setCurrentFilter] = useState<FilterType>("none");
   
   // 🚀 useRef per evitare doppio caricamento da StrictMode
   const hasLoaded = useRef(false);
+
+  // Pianeti filtrati
+  const filteredPlanets = filterPlanets(planets, currentFilter);
 
   // 🚀 Ottimizzazione: carica i pianeti solo una volta
   useEffect(() => {
@@ -46,12 +68,13 @@ export default function App() {
       try {
         hasLoaded.current = true; // Marca come caricato PRIMA della chiamata API
         
-        const data = await getAllExoplanets();
+        // 🚀 Usa la nuova funzione per caricare solo 100 pianeti
+        const data = await getLimitedExoplanets(100);
         
         if (!isMounted) return; // Evita state update se smontato
         
         const mapped = data.map(mapBackendPlanet);
-        console.log("✅ Pianeti mappati per l'app:", mapped.length);
+        console.log("✅ Pianeti limitati mappati per l'app:", mapped.length);
         setPlanets(mapped);
       } catch (err) {
         console.error("❌ Errore caricamento pianeti:", err);
@@ -128,6 +151,26 @@ export default function App() {
     };
   }, []); // Dependency array vuoto = carica solo una volta
 
+  // 🚀 Caricamento automatico di tutti i pianeti in background dopo il primo caricamento
+  useEffect(() => {
+    if (planets.length > 0 && planets.length <= 100) {
+      // Avvia il caricamento di tutti i pianeti in background dopo un breve delay
+      const timeoutId = setTimeout(async () => {
+        try {
+          console.log("🌌 Caricando tutti i pianeti in background...");
+          const allData = await getAllExoplanets();
+          const allMapped = allData.map(mapBackendPlanet);
+          console.log("✅ Tutti i pianeti caricati in background:", allMapped.length);
+          setPlanets(allMapped);
+        } catch (err) {
+          console.error("❌ Errore caricamento background pianeti:", err);
+        }
+      }, 2000); // 2 secondi di delay per non interferire con UX iniziale
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [planets.length]);
+
   if (loading) return <GalaxyLoadingScreen />;
 
   return (
@@ -142,7 +185,7 @@ export default function App() {
       }}
     >
       <GalaxyMap
-        planets={planets}
+        planets={filteredPlanets}
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
       />
@@ -152,17 +195,37 @@ export default function App() {
         <SearchBar
           slot="top"
           onSearch={(q) => {
-            const p = planets.find((pl) =>
+            const p = filteredPlanets.find((pl) =>
               pl.name.toLowerCase().includes(q.toLowerCase())
             );
             if (p) setSelectedPlanet(p);
           }}
+        />
+        <FilterDropdown
+          onFilterChange={setCurrentFilter}
+          currentFilter={currentFilter}
         />
         <InsertPlanet
           slot="bottom-left"
           onInsert={(p) => setPlanets((prev) => [...prev, p])}
         />
         <div slot="bottom-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Info filtro corrente */}
+          {currentFilter !== "none" && (
+            <div style={{
+              background: "rgba(0,0,0,0.7)",
+              borderRadius: 12,
+              padding: "8px 12px",
+              fontSize: "12px",
+              color: "#fff",
+              maxWidth: "200px",
+              textAlign: "center",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.1)"
+            }}>
+              {getFilterInfo(currentFilter, filteredPlanets.length, planets.length)}
+            </div>
+          )}
         </div>
       </HUD>
 
