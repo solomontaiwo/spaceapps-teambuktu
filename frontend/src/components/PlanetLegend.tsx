@@ -5,50 +5,50 @@ export default function PlanetLegend() {
     { 
       type: 'CANDIDATE', 
       color: '#ffffff', 
-      description: 'Found by Team Buktu - To Check',
+      description: 'CANDIDATE FINDED BY TEAM BUKTU',
       special: true,
       icon: '🔍'
     },
     { 
       type: 'CONFIRMED', 
       color: '#4169e1', 
-      description: 'Confirmed exoplanets',
+      description: 'Confirmed Exoplanets',
       icon: '✅'
     },
     { 
       type: 'FALSE POSITIVE', 
       color: '#666666', 
-      description: 'Not real planets',
+      description: 'Not Real Planets',
       icon: '❌'
     },
     { 
       type: 'Icy Worlds', 
       color: '#87ceeb', 
-      description: 'Cold planets (<200K)',
+      description: 'Cold Planets',
       icon: '❄️'
     },
     { 
       type: 'Volcanic', 
       color: '#8b0000', 
-      description: 'Hot lava worlds (>800K)',
+      description: 'Hot Lava Worlds',
       icon: '🌋'
     },
     { 
       type: 'Gas Giants', 
       color: '#dda0dd', 
-      description: 'Large gaseous planets',
+      description: 'Gaseous Planets',
       icon: '🪐'
     },
     { 
       type: 'Ocean Worlds', 
       color: '#006994', 
-      description: 'Potentially habitable',
+      description: 'Potentially Habitable',
       icon: '🌊'
     },
     { 
       type: 'Rocky Planets', 
       color: '#cd853f', 
-      description: 'Earth-like composition',
+      description: 'Earth-like',
       icon: '🪨'
     }
   ];
@@ -57,62 +57,56 @@ export default function PlanetLegend() {
     <div style={{
       position: 'absolute',
       left: 20,
-      top: 120, // Sotto la barra di ricerca
-      background: 'rgba(0, 0, 20, 0.92)',
+      top: 80, // Più vicino alla barra di ricerca
+      background: 'rgba(0, 0, 20, 0.95)',
       color: 'white',
-      padding: '16px',
-      borderRadius: '12px',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.15)',
-      fontSize: '13px',
+      padding: '12px',
+      borderRadius: '8px',
+      backdropFilter: 'blur(8px)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      fontSize: '12px',
       fontFamily: 'monospace',
       zIndex: 1000,
-      maxWidth: '320px',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+      maxWidth: '280px',
+      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.6)'
     }}>
       <h4 style={{ 
-        margin: '0 0 12px 0', 
-        fontSize: '16px', 
+        margin: '0 0 8px 0', 
+        fontSize: '14px', 
         fontWeight: 'bold',
-        borderBottom: '2px solid rgba(255, 255, 255, 0.2)',
-        paddingBottom: '8px',
         textAlign: 'center',
-        background: 'linear-gradient(90deg, #4169e1, #9370db)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
+        color: '#ffffff'
       }}>
-        🪐 Planet Classification
+        🪐 Planet Colors
       </h4>
       
-      <div style={{ display: 'grid', gap: '8px' }}>
+      <div style={{ display: 'grid', gap: '4px' }}>
         {planetTypes.map((planet, index) => (
           <div 
             key={index}
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '12px',
-              padding: '6px 8px',
-              borderRadius: '8px',
-              background: planet.special ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-              border: planet.special ? '1px solid rgba(255, 255, 255, 0.3)' : 'none',
-              transition: 'all 0.2s ease'
+              gap: '8px',
+              padding: '4px 6px',
+              borderRadius: '6px',
+              background: planet.special ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: planet.special ? '1px solid rgba(255, 255, 255, 0.4)' : 'none'
             }}
           >
-            <div style={{ fontSize: '16px', minWidth: '20px' }}>
+            <div style={{ fontSize: '14px', minWidth: '16px' }}>
               {planet.icon}
             </div>
             
             <div 
               style={{
-                width: '20px',
-                height: '20px',
+                width: '16px',
+                height: '16px',
                 borderRadius: '50%',
                 backgroundColor: planet.color,
-                border: planet.special ? '2px solid #ffffff' : '2px solid rgba(255, 255, 255, 0.3)',
+                border: planet.special ? '2px solid #ffffff' : '1px solid rgba(255, 255, 255, 0.3)',
                 flexShrink: 0,
-                boxShadow: planet.special ? '0 0 12px rgba(255, 255, 255, 0.6)' : '0 2px 4px rgba(0, 0, 0, 0.3)',
-                animation: planet.special ? 'pulse 2s ease-in-out infinite' : 'none'
+                boxShadow: planet.special ? '0 0 8px rgba(255, 255, 255, 0.8)' : 'none'
               }}
             />
             
@@ -120,15 +114,14 @@ export default function PlanetLegend() {
               <div style={{ 
                 fontWeight: planet.special ? 'bold' : '600',
                 color: planet.special ? '#ffffff' : '#e0e0e0',
-                fontSize: planet.special ? '14px' : '13px'
+                fontSize: planet.special ? '13px' : '12px'
               }}>
                 {planet.type}
               </div>
               <div style={{ 
-                fontSize: '11px', 
+                fontSize: '10px', 
                 color: planet.special ? '#f0f0f0' : '#b0b0b0',
-                fontStyle: planet.special ? 'italic' : 'normal',
-                marginTop: '2px'
+                fontStyle: planet.special ? 'italic' : 'normal'
               }}>
                 {planet.description}
               </div>
@@ -138,40 +131,15 @@ export default function PlanetLegend() {
       </div>
       
       <div style={{
-        marginTop: '16px',
-        paddingTop: '12px',
+        marginTop: '8px',
+        paddingTop: '6px',
         borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize: '9px',
+        color: '#888888'
       }}>
-        <div style={{
-          fontSize: '11px',
-          color: '#888888',
-          marginBottom: '4px'
-        }}>
-          🚀 Team Buktu - NASA Space Apps 2024
-        </div>
-        <div style={{
-          fontSize: '10px',
-          color: '#666666'
-        }}>
-          Real exoplanet data from Kepler mission
-        </div>
+        🚀 NASA Space Apps 2024 - Team Buktu
       </div>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @keyframes pulse {
-          0%, 100% { 
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6) !important;
-            transform: scale(1) !important;
-          }
-          50% { 
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.9) !important;
-            transform: scale(1.05) !important;
-          }
-        }
-        `
-      }} />
     </div>
   );
 }
