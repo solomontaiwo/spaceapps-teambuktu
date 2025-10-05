@@ -84,6 +84,10 @@ export default function App() {
           const mapped = data.map(mapBackendPlanet);
           console.log("✅ Pianeti limitati mappati per l'app:", mapped.length, mapped[0]);
           setPlanets(mapped);
+          
+          // 🚀 Rimuovi loading immediatamente dopo il successo
+          setLoading(false);
+          setTimeout(() => setFadeIn(true), 100); // Solo un piccolo delay per la transizione fade
         } else {
           console.log("⚠️ Nessun dato ricevuto, uso pianeti di test");
           throw new Error("No data received");
@@ -144,14 +148,13 @@ export default function App() {
         
         console.log("🔄 Usando pianeti di test:", testPlanets.length);
         setPlanets(testPlanets);
+        
+        // 🚀 Rimuovi loading anche per i pianeti di test
+        setLoading(false);
+        setTimeout(() => setFadeIn(true), 100);
       } finally {
-        if (isMounted) {
-          // Aggiungi un piccolo delay per mostrare il loading
-          setTimeout(() => {
-            setLoading(false);
-            setTimeout(() => setFadeIn(true), 100);
-          }, 1500); // 1.5 secondi minimo di loading
-        }
+        // Il finally ora serve solo per cleanup, il loading è già gestito sopra
+        console.log("🏁 Caricamento pianeti completato");
       }
     };
 
