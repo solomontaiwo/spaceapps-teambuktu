@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
+import { useMenu } from "../contexts/MenuContext";
 
 export type FilterType = 
   | "none"
@@ -24,7 +25,8 @@ const filterLabels = {
 };
 
 export default function FilterDropdown({ onFilterChange, currentFilter }: FilterDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { openMenu, toggleMenu, setOpenMenu } = useMenu();
+  const isOpen = openMenu === 'filter';
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Detecting mobile
@@ -34,17 +36,17 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        if (isOpen) setOpenMenu(null);
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isOpen, setOpenMenu]);
 
   const handleFilterSelect = (filter: FilterType) => {
     onFilterChange(filter);
-    setIsOpen(false);
+    setOpenMenu(null);
   };
 
   return (
@@ -57,7 +59,7 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
     >
       {/* Bottone principale */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => toggleMenu('filter')}
         style={{
           background: "rgba(0, 0, 0, 0.8)",
           border: "1px solid rgba(255,255,255,0.2)",

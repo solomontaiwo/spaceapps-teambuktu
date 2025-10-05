@@ -495,58 +495,36 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
       }}
       style={{ width: '100%', height: '100%' }}
     >
-      {/* 🌟 ILLUMINAZIONE GALATTICA per dettagli 3D */}
-      <ambientLight intensity={0.4} color="#1a1a3e" />
+      {/* 🌟 ILLUMINAZIONE GALATTICA POTENZIATA per visibilità diurna */}
+      <ambientLight intensity={0.8} color="#2a2a5e" />
       
-      {/* ✨ Luce delle stelle centrali */}
+      {/* ✨ Luce delle stelle centrali - POTENZIATA */}
       <pointLight 
         position={[0, 0, 0]} 
-        intensity={0.8} 
-        color="#4466bb"
+        intensity={1.5} 
+        color="#5577dd"
         distance={1000}
         decay={2}
       />
       
-      {/* 🌌 Luce diffusa galattica */}
+      {/* 🌌 Luce diffusa galattica - POTENZIATA */}
       <directionalLight 
         position={[200, 200, 200]} 
-        intensity={0.3} 
-        color="#6677cc"
+        intensity={0.7} 
+        color="#7788dd"
       />
       
-      {/* 🌅 Luci secondarie per illuminazione diffusa */}
-      <pointLight position={[0, 0, 0]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[300, 200, 200]} intensity={0.5} color="#ffeeaa" />
-      <pointLight position={[-300, -200, -200]} intensity={0.5} color="#aaeeff" />
+      {/* 🌅 Luci secondarie per illuminazione diffusa - POTENZIATE */}
+      <pointLight position={[0, 0, 0]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[300, 200, 200]} intensity={0.8} color="#ffeeaa" />
+      <pointLight position={[-300, -200, -200]} intensity={0.8} color="#aaeeff" />
       
-      {/* 🌌 Luce galattica di fondo */}
+      {/* 🌌 Luce galattica di fondo - POTENZIATA */}
       <hemisphereLight 
-        color="#4a5568" 
-        groundColor="#1a202c" 
-        intensity={0.2} 
+        color="#6a7588" 
+        groundColor="#2a303c" 
+        intensity={0.5} 
       />
-
-      {/* 🕳️ CENTRO GALATTICO - Buco nero supermassiccio */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[8, 32, 32]} />
-        <meshStandardMaterial
-          color="#000000"
-          emissive="#110033"
-          emissiveIntensity={0.1}
-        />
-      </mesh>
-      
-      {/* 🌌 DISCO GALATTICO CENTRALE - Materia densa */}
-      <mesh position={[0, 0, 0]}>
-        <torusGeometry args={[50, 20, 16, 100]} />
-        <meshStandardMaterial
-          color="#332255"
-          emissive="#221144"
-          emissiveIntensity={0.2}
-          transparent
-          opacity={0.4}
-        />
-      </mesh>
       
       {/* 🌀 BRACCI SPIRALE GALATTICI (effetto visivo) */}
       {[0, 1, 2, 3].map((armIndex) => {
@@ -567,13 +545,14 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
         );
       })}
       
-      {/* 🌟 Campo stellare galattico OTTIMIZZATO per velocità */}
+      {/* 🌟 Campo stellare galattico TRIDIMENSIONALE COMPLETO */}
       <Stars 
-        radius={2000}           // 🌌 Raggio galattico esteso per nuova dispersione
-        depth={800}             // 🌟 Profondità del disco galattico
-        count={25000}           // ⭐ RIDOTTO per prestazioni migliori
-        factor={6}              // 🔥 Stelle brillanti
-        fade 
+        radius={2000}           // 🌌 Raggio galattico esteso
+        depth={2000}            // 🌟 DEPTH AUMENTATO per copertura verticale totale (800 → 2000)
+        count={28000}           // ⭐ Densità ottimale
+        factor={12}             // 🔥🔥 MOLTO PIÙ LUMINOSE - visibili con luce diurna
+        saturation={1}          // 🎨 Saturazione massima per colori brillanti
+        fade={false}            // ❌ No fade per massima luminosità
         speed={0.03}            // 🚀 Rotazione più veloce
       />
       

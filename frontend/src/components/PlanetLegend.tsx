@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useMenu } from '../contexts/MenuContext';
 
 type PlanetLegendProps = {
   hidden?: boolean;
 };
 
 export default function PlanetLegend({ hidden = false }: PlanetLegendProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { openMenu, toggleMenu, setOpenMenu } = useMenu();
+  const isOpen = openMenu === 'legend';
   
   const planetTypes = [
     { 
@@ -75,7 +77,7 @@ export default function PlanetLegend({ hidden = false }: PlanetLegendProps) {
     }}>
       {/* 🎯 BOTTONE LEGENDA */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => toggleMenu('legend')}
         style={{
           padding: isMobile ? '8px 10px' : '8px 12px',
           background: 'linear-gradient(135deg, rgba(75, 0, 130, 0.9), rgba(138, 43, 226, 0.9))',

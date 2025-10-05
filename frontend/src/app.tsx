@@ -7,6 +7,7 @@ import HUD from "./components/HUD";
 import GalaxyLoadingScreen from "./components/GalaxyLoadingScreen";
 import FilterDropdown, { FilterType } from "./components/FilterDropdown";
 import PlanetLegend from "./components/PlanetLegend";
+import { MenuProvider } from "./contexts/MenuContext";
 
 import { getAllExoplanets, getLimitedExoplanets } from "./api";
 import type { Planet } from "./types";
@@ -798,27 +799,28 @@ export default function App() {
   if (loading) return <GalaxyLoadingScreen />;
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        background: "black",
-        overflow: "hidden",
-        opacity: fadeIn ? 1 : 0,
-        transition: "opacity 1s ease-in-out"
-      }}
-    >
-      <GalaxyMap
-        planets={filteredPlanets}
-        selected={selectedPlanet}
-        onSelect={setSelectedPlanet}
-      />
+    <MenuProvider>
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          background: "black",
+          overflow: "hidden",
+          opacity: fadeIn ? 1 : 0,
+          transition: "opacity 1s ease-in-out"
+        }}
+      >
+        <GalaxyMap
+          planets={filteredPlanets}
+          selected={selectedPlanet}
+          onSelect={setSelectedPlanet}
+        />
 
-      {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
-      <PlanetLegend hidden={selectedPlanet !== null} />
+        {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
+        <PlanetLegend hidden={selectedPlanet !== null} />
 
-      {/* HUD and controls - nascosto quando un pianeta è selezionato */}
-      <HUD hidden={selectedPlanet !== null}>
+        {/* HUD and controls - nascosto quando un pianeta è selezionato */}
+        <HUD hidden={selectedPlanet !== null}>
         <SearchBar
           slot="top"
           onSearch={(q) => {
@@ -857,10 +859,11 @@ export default function App() {
         </div>
       </HUD>
 
-      <InfoPanel
-        planet={selectedPlanet}
-        onClose={() => setSelectedPlanet(null)}
-      />
-    </div>
+        <InfoPanel
+          planet={selectedPlanet}
+          onClose={() => setSelectedPlanet(null)}
+        />
+      </div>
+    </MenuProvider>
   );
 }

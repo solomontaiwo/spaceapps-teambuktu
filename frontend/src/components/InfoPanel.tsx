@@ -156,7 +156,7 @@ export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
                 fontSize: "0.9rem"
               }}
             >
-              {isLoading ? "🔄 Analyzing..." : "🚀 Predict HEXAPLANET"}
+              {isLoading ? "🔄 Analyzing..." : "🚀 Predict Exoplanet"}
             </button>
           )}
           

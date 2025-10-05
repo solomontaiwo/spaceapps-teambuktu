@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMenu } from "../contexts/MenuContext";
 import type { Planet } from "../types";
 
 type InsertPlanetProps = {
@@ -7,7 +8,8 @@ type InsertPlanetProps = {
 };
 
 export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
-  const [open, setOpen] = useState(false);
+  const { openMenu, toggleMenu, setOpenMenu } = useMenu();
+  const open = openMenu === 'insert';
   const [form, setForm] = useState({
     name: "",
     radius: 1.0,        // Earth radii
@@ -43,7 +45,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
     };
     
     onInsert(newPlanet);
-    setOpen(false);
+    setOpenMenu(null);
     
     // Reset form
     setForm({
@@ -81,7 +83,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
       {!open ? (
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => toggleMenu('insert')}
             style={{
               padding: isMobile ? "8px 14px" : "10px 18px",
               background: "linear-gradient(90deg, #2b5876, #4e4376)",
@@ -348,7 +350,7 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
             </button>
             <button 
               type="button" 
-              onClick={() => setOpen(false)}
+              onClick={() => setOpenMenu(null)}
               style={{
                 padding: "8px 16px",
                 background: "linear-gradient(90deg, #e74c3c, #c0392b)",
