@@ -60,6 +60,25 @@ export default function App() {
   // Pianeti filtrati
   const filteredPlanets = filterPlanets(planets, currentFilter);
 
+  // 🌌 Funzione per caricare tutti i pianeti in background (non bloccante)
+  const loadAllPlanetsInBackground = async () => {
+    try {
+      console.log("🌌 Caricando tutti i pianeti in background...");
+      const allData = await getAllExoplanets();
+      const allMapped = allData.map(mapBackendPlanet);
+      console.log("✅ Tutti i pianeti caricati in background:", allMapped.length);
+      
+      // Aggiorna solo se abbiamo più pianeti di quelli attuali
+      if (allMapped.length > planets.length) {
+        setPlanets(allMapped);
+        console.log("🔄 Dataset aggiornato con tutti i pianeti");
+      }
+    } catch (err) {
+      console.error("❌ Errore caricamento background pianeti:", err);
+      // Non facciamo nulla in caso di errore - manteniamo i 100 pianeti già caricati
+    }
+  };
+
   // 🚀 Ottimizzazione: carica i pianeti solo una volta
   useEffect(() => {
     // Se abbiamo già caricato, non fare nulla (evita StrictMode double render)
@@ -88,6 +107,11 @@ export default function App() {
           // 🚀 Rimuovi loading immediatamente dopo il successo
           setLoading(false);
           setTimeout(() => setFadeIn(true), 100); // Solo un piccolo delay per la transizione fade
+          
+          // 🌌 Avvia caricamento di tutti i pianeti in background (non bloccante)
+          setTimeout(() => {
+            loadAllPlanetsInBackground();
+          }, 500); // Piccolo delay per non interferire con l'UX iniziale
         } else {
           console.log("⚠️ Nessun dato ricevuto, uso pianeti di test");
           throw new Error("No data received");
@@ -165,26 +189,6 @@ export default function App() {
       isMounted = false;
     };
   }, []); // Dependency array vuoto = carica solo una volta
-
-  // 🚀 Caricamento automatico di tutti i pianeti in background dopo il primo caricamento
-  useEffect(() => {
-    if (planets.length > 0 && planets.length <= 100) {
-      // Avvia il caricamento di tutti i pianeti in background dopo un breve delay
-      const timeoutId = setTimeout(async () => {
-        try {
-          console.log("🌌 Caricando tutti i pianeti in background...");
-          const allData = await getAllExoplanets();
-          const allMapped = allData.map(mapBackendPlanet);
-          console.log("✅ Tutti i pianeti caricati in background:", allMapped.length);
-          setPlanets(allMapped);
-        } catch (err) {
-          console.error("❌ Errore caricamento background pianeti:", err);
-        }
-      }, 2000); // 2 secondi di delay per non interferire con UX iniziale
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [planets.length]);
 
   if (loading) return <GalaxyLoadingScreen />;
 
