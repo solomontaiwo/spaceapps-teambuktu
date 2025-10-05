@@ -10,7 +10,6 @@ type PlanetProps = {
   orbitalPeriod: number;
   onSelect?: () => void;
   isSelected?: boolean;
-  timeFlow: number; // aggiunto
 };
 
 export default function Planet({
@@ -20,14 +19,13 @@ export default function Planet({
   color = "#aaaaaa",
   orbitalPeriod,
   onSelect,
-  isSelected,
-  timeFlow // aggiunto
+  isSelected
 }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null!);
   const angleRef = useRef(Math.random() * Math.PI * 2);
 
   useFrame((_, delta) => {
-    const speed = (delta * timeFlow) / 20; // timeFlow influenza velocità
+    const speed = delta / 20; // velocità fissa semplificata
     angleRef.current += (2 * Math.PI / orbitalPeriod) * speed;
     const x = distance * Math.cos(angleRef.current);
     const z = distance * Math.sin(angleRef.current);

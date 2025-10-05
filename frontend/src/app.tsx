@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import GalaxyMap from "./scenes/GalaxyMap";
-import TimeBar from "./components/TimeBar";
 import InfoPanel from "./components/InfoPanel";
 import SearchBar from "./components/SearchBar";
 import InsertPlanet from "./components/InsertPlanet";
@@ -26,7 +25,6 @@ function mapBackendPlanet(p: any): Planet {
 export default function App() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timeFlow, setTimeFlow] = useState(200);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
   
   // 🚀 useRef per evitare doppio caricamento da StrictMode
@@ -139,7 +137,6 @@ export default function App() {
         planets={planets}
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
-        timeFlow={timeFlow}
       />
 
       {/* HUD e controlli */}
@@ -158,7 +155,6 @@ export default function App() {
           onInsert={(p) => setPlanets((prev) => [...prev, p])}
         />
         <div slot="bottom-right" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <TimeBar time={timeFlow} onChange={setTimeFlow} />
         </div>
       </HUD>
 

@@ -80,12 +80,10 @@ function classifyPlanet(temp: number, radius: number) {
 /* -------------------- COMPONENTE ESOPIANETA -------------------- */
 function ExoPlanet({
   planet,
-  timeFlow,
   onSelect,
   selected,
 }: {
   planet: Planet;
-  timeFlow: number;
   onSelect: (p: Planet) => void;
   selected?: Planet;
 }) {
@@ -169,14 +167,14 @@ function ExoPlanet({
   useFrame((_, delta) => {
     if (!meshRef.current || !orbitRef.current) return;
     
-    // 🌍 ROTAZIONE DEL PIANETA (giorno)
+    // 🌍 ROTAZIONE DEL PIANETA (giorno) - velocità fissa
     const rotationPeriod = planet.period || 24; // ore
-    const rotationSpeed = (timeFlow * delta) / (rotationPeriod * 3600); // converti ore in secondi
+    const rotationSpeed = delta / (rotationPeriod * 36); // velocità fissa più lenta
     meshRef.current.rotation.y += rotationSpeed * 0.1; // Rotazione realistica ma visibile
     
-    // 🪐 MOVIMENTO ORBITALE (anno)
+    // 🪐 MOVIMENTO ORBITALE (anno) - velocità fissa
     const orbitalPeriod = (planet.period ?? 365) * 24; // giorni -> ore
-    const orbitalSpeed = (timeFlow * delta) / (orbitalPeriod * 3600); // converti in secondi
+    const orbitalSpeed = delta / (orbitalPeriod * 360); // velocità fissa più lenta
     orbitRef.current.rotation.y += orbitalSpeed * 0.05; // Movimento orbitale più lento
     
     // ✨ Pulsazione atmosferica (effetto realistico)
@@ -414,7 +412,6 @@ interface GalaxyMapProps {
   planets: Planet[];
   selected: Planet | null;
   onSelect: (planet: Planet | null) => void;
-  timeFlow: number;
   onCompareWithEarth?: (planet: Planet) => void; // 🌍 Callback per confronto con la Terra
 }
 
@@ -422,7 +419,6 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
   planets, 
   selected, 
   onSelect, 
-  timeFlow, 
   onCompareWithEarth 
 }) => {
   const controlsRef = useRef<any>(null);
@@ -488,7 +484,6 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
         <ExoPlanet
           key={i}
           planet={p}
-          timeFlow={timeFlow}
           onSelect={onSelect}
           selected={selected || undefined}
         />
