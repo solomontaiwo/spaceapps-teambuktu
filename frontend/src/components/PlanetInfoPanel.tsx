@@ -7,10 +7,9 @@ import './PlanetInfoPanel.css';
 interface PlanetData {
   id: string;
   name: string;
-  radius: number;          // Dal backend per compatibilità frontend
-  period: number;          // Dal backend per compatibilità frontend
-  eq_temp: number;         // Dal backend per compatibilità frontend
-  // Campi originali dal KOI_cleaned.csv per maggiori dettagli
+  radius: number;          
+  period: number;          
+  eq_temp: number;        
   koi_disposition?: string;
   koi_prad?: number;
   koi_period?: number;
@@ -37,7 +36,7 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🤖 Funzione per predire se è un HEXAPLANET
+  // 🤖 Funzione per predire se è un Exoplanet
   const handlePredictHexaplanet = async () => {
     setIsLoading(true);
     setError(null);
