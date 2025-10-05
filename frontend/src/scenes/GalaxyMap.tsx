@@ -9,8 +9,24 @@ import {
   isInHabitableZone,
   debugPlanetData 
 } from "../utils/planetSizeCalculations";
+import { RealisticPlanet } from "../components/RealisticPlanet";
 
-// 🔬 Sistema di classificazione planetaria scientifica
+// � Mapper per convertire classificazione pianeti al tipo realistico
+function getPlanetTypeForRealistic(temp: number, radius: number, disposition?: string): 
+  'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'oceanic' | 'candidate' {
+  
+  if (disposition === 'CANDIDATE') return 'candidate';
+  
+  const earthRadii = radius || 1;
+  
+  if (temp < 200) return 'icy';
+  if (temp > 800) return 'volcanic';
+  if (earthRadii > 4) return 'gaseous';
+  if (temp > 273 && temp < 373 && earthRadii > 0.8 && earthRadii < 1.5) return 'oceanic';
+  return 'rocky';
+}
+
+// �🔬 Sistema di classificazione planetaria scientifica
 function classifyPlanet(temp: number, radius: number, disposition?: string) {
   const earthRadii = radius || 1;
   
@@ -95,10 +111,12 @@ function ExoPlanet({
   planet,
   onSelect,
   selected,
+  useRealistic = false,
 }: {
   planet: Planet;
   onSelect: (p: Planet) => void;
   selected?: Planet;
+  useRealistic?: boolean;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const orbitRef = useRef<THREE.Group>(null);
@@ -218,6 +236,32 @@ function ExoPlanet({
   
   // 🌍 Calcola i raggi terrestri per effetti materiali
   const earthRadii = planet.radius || 1;
+
+  // 🎨 Se richiesto, usa il componente realistico
+  if (useRealistic) {
+    const planetType = getPlanetTypeForRealistic(
+      planet.eq_temp || 300, 
+      planet.radius || 1, 
+      planet.koi_disposition
+    );
+    
+    return (
+      <RealisticPlanet
+        position={[position.x, position.y, position.z]}
+        size={radius}
+        planetType={planetType}
+        temperature={planet.eq_temp || 300}
+        selected={isSelected}
+        onClick={() => onSelect(planet)}
+        planetData={{
+          name: planet.name,
+          period: planet.period || 365,
+          radius: planet.radius || 1,
+          koi_disposition: planet.koi_disposition
+        }}
+      />
+    );
+  }
 
   return (
     <group ref={orbitRef}>
@@ -468,6 +512,7 @@ interface GalaxyMapProps {
   onSelect: (planet: Planet | null) => void;
   onCompareWithEarth?: (planet: Planet) => void; // 🌍 Callback per confronto con la Terra
   zoomToPlanet?: Planet | null; // 🎯 Pianeta su cui zoomare
+  useRealisticPlanets?: boolean; // 🎨 Usa pianeti ultra-realistici
 }
 
 const GalaxyMap: React.FC<GalaxyMapProps> = ({ 
@@ -475,7 +520,8 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
   selected, 
   onSelect, 
   onCompareWithEarth,
-  zoomToPlanet
+  zoomToPlanet,
+  useRealisticPlanets = true // 🎨 Default: usa pianeti realistici
 }) => {
   const controlsRef = useRef<any>(null);
   const filtered = useMemo(() => planets.slice(0, 200), [planets]);
@@ -676,6 +722,7 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
           planet={p}
           onSelect={onSelect}
           selected={selected || undefined}
+          useRealistic={useRealisticPlanets}
         />
       ))}
 
