@@ -6,6 +6,7 @@ import InsertPlanet from "./components/InsertPlanet";
 import HUD from "./components/HUD";
 import GalaxyLoadingScreen from "./components/GalaxyLoadingScreen";
 import FilterDropdown, { FilterType } from "./components/FilterDropdown";
+import PlanetLegend from "./components/PlanetLegend";
 
 import { getAllExoplanets, getLimitedExoplanets } from "./api";
 import type { Planet } from "./types";
@@ -13,12 +14,14 @@ import { filterPlanets, getFilterInfo } from "./utils/planetFilters";
 
 // Funzione di mapping CORRETTA per i dati del backend
 function mapBackendPlanet(p: any): Planet {
+  console.log("🔍 Mapping planet data:", p); // Debug log
+  
   // Gestisce sia i dati dal database (/planets/) che dal CSV (/planets/all)
   const isDbFormat = p.koi_prad !== undefined; // I dati dal DB hanno koi_prad, quelli dal CSV hanno radius
   
   if (isDbFormat) {
     // Formato dal database (endpoint /planets/)
-    return {
+    const mapped = {
       name: p.kepoi_name || p.name || `Planet-${p.id || Math.random().toString(36).substr(2, 9)}`,
       period: p.koi_period || 365,
       radius: p.koi_prad || 1,
@@ -26,10 +29,13 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.koi_steff || 5000,
       ra: p.ra || Math.random() * 360,
       dec: p.dec || (Math.random() - 0.5) * 180,
+      koi_disposition: p.koi_disposition || 'CANDIDATE', // Aggiunto per classificazione
     };
+    console.log("🎯 Mapped DB planet:", mapped);
+    return mapped;
   } else {
     // Formato dal CSV (endpoint /planets/all)
-    return {
+    const mapped = {
       name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
       period: p.period || 365,
       radius: p.radius || 1,
@@ -37,7 +43,10 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.star_temp || 5000,
       ra: p.coordinates?.ra || Math.random() * 360,
       dec: p.coordinates?.dec || (Math.random() - 0.5) * 180,
+      koi_disposition: p.koi_disposition || 'CANDIDATE', // Aggiunto per classificazione
     };
+    console.log("🎯 Mapped CSV planet:", mapped);
+    return mapped;
   }
 }
 
@@ -57,14 +66,18 @@ export default function App() {
   // 🌌 Funzione per caricare tutti i pianeti in background (non bloccante)
   const loadAllPlanetsInBackground = async () => {
     try {
-      const allData = await getAllExoplanets(true); // 🔥 Force reload per evitare cache conflict
+      console.log("🌌 Caricando tutti i pianeti in background...");
+      const allData = await getAllExoplanets();
       const allMapped = allData.map(mapBackendPlanet);
+      console.log("✅ Tutti i pianeti caricati in background:", allMapped.length);
       
       // Aggiorna solo se abbiamo più pianeti di quelli attuali
       if (allMapped.length > planets.length) {
         setPlanets(allMapped);
+        console.log("🔄 Dataset aggiornato con tutti i pianeti");
       }
     } catch (err) {
+      console.error("❌ Errore caricamento background pianeti:", err);
       // Non facciamo nulla in caso di errore - manteniamo i 100 pianeti già caricati
     }
   };
@@ -73,6 +86,7 @@ export default function App() {
   useEffect(() => {
     // Se abbiamo già caricato, non fare nulla (evita StrictMode double render)
     if (hasLoaded.current) {
+      console.log("🚫 Caricamento già eseguito, skipping...");
       return;
     }
     
@@ -82,26 +96,39 @@ export default function App() {
       try {
         hasLoaded.current = true; // Marca come caricato PRIMA della chiamata API
         
+        console.log("🚀 Iniziando caricamento 100 pianeti...");
         const data = await getLimitedExoplanets(100);
+        console.log("📊 Dati ricevuti dal backend:", data.length, data[0]);
         
         if (!isMounted) return; // Evita state update se smontato
         
         if (data && data.length > 0) {
-          const mapped = data.map(mapBackendPlanet);
-          setPlanets(mapped);
-          
-          // 🚀 Rimuovi loading immediatamente dopo il successo
-          setLoading(false);
-          setTimeout(() => setFadeIn(true), 100); // Solo un piccolo delay per la transizione fade
-          
-          // 🌌 Avvia caricamento di tutti i pianeti in background (non bloccante)
-          setTimeout(() => {
-            loadAllPlanetsInBackground();
-          }, 500); // Piccolo delay per non interferire con l'UX iniziale
+          try {
+            const mapped = data.map(mapBackendPlanet);
+            console.log("✅ Pianeti limitati mappati per l'app:", mapped.length, mapped[0]);
+            setPlanets(mapped);
+            
+            // 🚀 Rimuovi loading immediatamente dopo il successo
+            setLoading(false);
+            setTimeout(() => setFadeIn(true), 100); // Solo un piccolo delay per la transizione fade
+            
+            // 🌌 Avvia caricamento di tutti i pianeti in background (non bloccante)
+            setTimeout(() => {
+              loadAllPlanetsInBackground();
+            }, 500); // Piccolo delay per non interferire con l'UX iniziale
+          } catch (mappingError) {
+            console.error("❌ Errore nel mapping dei pianeti:", mappingError);
+            console.log("📊 Dati raw che hanno causato l'errore:", data[0]);
+            // Forza l'uscita dal loading anche in caso di errore di mapping
+            setLoading(false);
+            setTimeout(() => setFadeIn(true), 100);
+          }
         } else {
+          console.log("⚠️ Nessun dato ricevuto, uso pianeti di test");
           throw new Error("No data received");
         }
       } catch (err) {
+        console.error("❌ Errore caricamento pianeti:", err);
         
         if (!isMounted) return;
         
@@ -154,6 +181,7 @@ export default function App() {
           }
         ];
         
+        console.log("🔄 Usando pianeti di test:", testPlanets.length);
         setPlanets(testPlanets);
         
         // 🚀 Rimuovi loading anche per i pianeti di test
@@ -161,14 +189,25 @@ export default function App() {
         setTimeout(() => setFadeIn(true), 100);
       } finally {
         // Il finally ora serve solo per cleanup, il loading è già gestito sopra
+        console.log("🏁 Caricamento pianeti completato");
       }
     };
 
     loadPlanets();
 
+    // 🚨 Timeout di sicurezza: forza l'uscita dal loading dopo 10 secondi
+    const safetyTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn("⚠️ Timeout loading - forzando uscita dal loading screen");
+        setLoading(false);
+        setFadeIn(true);
+      }
+    }, 10000);
+
     // Cleanup: evita memory leak
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimeout);
     };
   }, []); // Dependency array vuoto = carica solo una volta
 
@@ -191,6 +230,9 @@ export default function App() {
         onSelect={setSelectedPlanet}
       />
 
+      {/* Legenda dei pianeti */}
+      <PlanetLegend />
+
       {/* HUD e controlli */}
       <HUD>
         <SearchBar
@@ -203,7 +245,6 @@ export default function App() {
           }}
         />
         <FilterDropdown
-          slot="top-right"
           onFilterChange={setCurrentFilter}
           currentFilter={currentFilter}
         />

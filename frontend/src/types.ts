@@ -6,6 +6,7 @@ export type Planet = {
   star_temp?: number;
   ra?: number;
   dec?: number;
+  koi_disposition?: string; // CANDIDATE, CONFIRMED, FALSE POSITIVE
   // Puoi lasciare altri campi come mass, distance, orbitalPeriod, color, ecc.
   distance?: number;
   orbitalPeriod?: number;

@@ -11,8 +11,21 @@ import {
 } from "../utils/planetSizeCalculations";
 
 // 🔬 Sistema di classificazione planetaria scientifica
-function classifyPlanet(temp: number, radius: number) {
+function classifyPlanet(temp: number, radius: number, disposition?: string) {
   const earthRadii = radius || 1;
+  
+  // 🔍 PIANETI CANDIDATE sono BIANCHI!
+  if (disposition === 'CANDIDATE') {
+    return {
+      type: 'candidate' as const,
+      baseColor: "#ffffff",
+      emissiveColor: "#f8f8f8", 
+      atmosphereColor: "#e6e6e6",
+      roughness: 0.4,
+      metalness: 0.2,
+      needsAnalysis: true
+    };
+  }
   
   let type: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'oceanic';
   let materialProps;
@@ -132,7 +145,7 @@ function ExoPlanet({
   const planetClassification = useMemo(() => {
     const temp = planet.eq_temp || 300;
     const earthRadii = planet.radius || 1;
-    const classification = classifyPlanet(temp, earthRadii);
+    const classification = classifyPlanet(temp, earthRadii, planet.koi_disposition);
     
     // Migliora la classificazione con dati dal backend
     return {
@@ -141,7 +154,7 @@ function ExoPlanet({
       isHabitable: isInHabitableZone(earthRadii, temp),
       categoryColor: getPlanetCategoryColor(earthRadii)
     };
-  }, [planet.eq_temp, planet.radius, planetSizeInfo]);
+  }, [planet.eq_temp, planet.radius, planetSizeInfo, planet.koi_disposition]);
 
   // 🎨 Materiali ULTRA-REALISTICI direttamente dalla classificazione
   const planetMaterials = useMemo(() => {
@@ -398,6 +411,32 @@ function ExoPlanet({
                     : "#ff0000"
                 }
                 emissiveIntensity={0.5}
+              />
+            </mesh>
+          </>
+        )}
+        
+        {/* 🔍 Indicatore speciale per pianeti CANDIDATE */}
+        {planetClassification.type === 'candidate' && (
+          <>
+            {/* Anello pulsante bianco per CANDIDATE */}
+            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
+              <ringGeometry args={[radius * 1.3, radius * 1.5, 16]} />
+              <meshBasicMaterial
+                color="#ffffff"
+                transparent
+                opacity={0.8}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+            
+            {/* Indicatore luminoso sopra il pianeta */}
+            <mesh position={[0, radius + 1.2, 0]}>
+              <sphereGeometry args={[0.12, 8, 8]} />
+              <meshStandardMaterial
+                color="#ffffff"
+                emissive="#ffffff"
+                emissiveIntensity={0.6}
               />
             </mesh>
           </>
