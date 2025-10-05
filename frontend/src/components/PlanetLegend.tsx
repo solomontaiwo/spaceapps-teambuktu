@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 
-export default function PlanetLegend() {
+type PlanetLegendProps = {
+  hidden?: boolean;
+};
+
+export default function PlanetLegend({ hidden = false }: PlanetLegendProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const planetTypes = [
@@ -55,30 +59,37 @@ export default function PlanetLegend() {
     }
   ];
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   return (
     <div style={{
       position: 'absolute',
-      left: '10px',
-      top: '80px', // Sotto la barra di ricerca
+      // Sempre in basso a destra, sia su desktop che mobile
+      right: '10px',
+      bottom: '10px',
       zIndex: 1000,
+      opacity: hidden ? 0 : 1,
+      visibility: hidden ? 'hidden' : 'visible',
+      transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+      pointerEvents: hidden ? 'none' : 'auto',
     }}>
       {/* 🎯 BOTTONE LEGENDA */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          padding: '8px 12px',
+          padding: isMobile ? '8px 10px' : '8px 12px',
           background: 'linear-gradient(135deg, rgba(75, 0, 130, 0.9), rgba(138, 43, 226, 0.9))',
           border: '1px solid rgba(255, 255, 255, 0.3)',
           borderRadius: '8px',
           color: 'white',
-          fontSize: '14px',
+          fontSize: isMobile ? '13px' : '14px',
           fontWeight: '600',
           cursor: 'pointer',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: isMobile ? '4px' : '6px',
           transition: 'all 0.2s ease',
           minWidth: 'fit-content'
         }}
@@ -111,25 +122,32 @@ export default function PlanetLegend() {
       {isOpen && (
         <div style={{
           position: 'absolute',
-          top: '50px',
-          left: '0',
+          // Sempre si apre verso l'alto da destra
+          bottom: '50px',
+          right: '0',
           background: 'rgba(0, 0, 20, 0.95)',
           color: 'white',
-          padding: '12px',
+          padding: isMobile ? '10px' : '12px',
           borderRadius: '8px',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(255, 255, 255, 0.2)',
-          fontSize: '12px',
+          fontSize: isMobile ? '11px' : '12px',
           fontFamily: 'monospace',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-          maxWidth: window.innerWidth < 768 ? '280px' : '320px', // Responsive width
-          minWidth: '250px',
-          animation: 'slideDown 0.3s ease'
+          maxWidth: isMobile ? 'calc(100vw - 40px)' : '320px',
+          minWidth: isMobile ? 'auto' : '250px',
+          maxHeight: isMobile ? '50vh' : 'auto',
+          overflowY: isMobile ? 'auto' : 'visible',
+          animation: 'slideUp 0.3s ease'
         }}>
           <style dangerouslySetInnerHTML={{
             __html: `
             @keyframes slideDown {
               from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes slideUp {
+              from { opacity: 0; transform: translateY(10px); }
               to { opacity: 1; transform: translateY(0); }
             }
             `
@@ -227,7 +245,7 @@ export default function PlanetLegend() {
             fontSize: '8px',
             color: '#888888'
           }}>
-            🚀 NASA Space Apps 2024 - Team Buktu
+            🚀 NASA Space Apps 2025 - Team Buktu
           </div>
         </div>
       )}

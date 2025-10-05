@@ -74,6 +74,8 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
     onInsert(randomPlanet);
   }
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   return (
     <div style={{ position: "absolute", bottom: 20, left: 20, zIndex: 20 }} {...(slot ? { slot } : {})}>
       {!open ? (
@@ -81,18 +83,18 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           <button
             onClick={() => setOpen(true)}
             style={{
-              padding: "10px 18px",
+              padding: isMobile ? "8px 14px" : "10px 18px",
               background: "linear-gradient(90deg, #2b5876, #4e4376)",
               border: "none",
               borderRadius: 12,
               color: "white",
               fontWeight: 600,
-              fontSize: "0.95rem",
+              fontSize: isMobile ? "0.85rem" : "0.95rem",
               cursor: "pointer",
               boxShadow: "0 0 10px rgba(255,255,255,0.3)"
             }}
           >
-            🪐 Add Exoplanet
+            {isMobile ? "🪐 Add" : "🪐 Add Exoplanet"}
           </button>
         </div>
       ) : (
@@ -100,10 +102,13 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           onSubmit={handleSubmit}
           style={{
             background: "rgba(10, 10, 30, 0.95)",
-            padding: 16,
+            padding: isMobile ? 12 : 16,
             borderRadius: 12,
             color: "white",
-            width: "300px",
+            width: isMobile ? "calc(100vw - 80px)" : "300px",
+            maxWidth: "300px",
+            maxHeight: isMobile ? "70vh" : "auto",
+            overflowY: isMobile ? "auto" : "visible",
             boxShadow: "0 0 20px rgba(0, 0, 0, 0.7)",
             backdropFilter: "blur(8px)",
             border: "1px solid rgba(255, 255, 255, 0.1)"

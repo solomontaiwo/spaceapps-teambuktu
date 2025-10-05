@@ -36,6 +36,9 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Detect mobile for responsive layout
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   // 🤖 Funzione per predire se è un Exoplanet
   const handlePredictHexaplanet = async () => {
     setIsLoading(true);
@@ -88,7 +91,11 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   return (
     <div className="planet-info-panel">
       <div className="planet-header">
-        <h2>{planet.name}</h2>
+        <h2 title={planet.name}>
+          {isMobile && planet.name.length > 20 
+            ? `${planet.name.substring(0, 17)}...` 
+            : planet.name}
+        </h2>
         <button onClick={onClose} className="close-btn">×</button>
       </div>
       

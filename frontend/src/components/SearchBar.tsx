@@ -29,10 +29,6 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
   return (
     <div
       style={{
-        position: "absolute",
-        top: 12,
-        left: 12, // Spostato a sinistra
-        zIndex: 10,
         background: "rgba(0,0,0,0.7)",
         borderRadius: 12,
         padding: "6px 10px",

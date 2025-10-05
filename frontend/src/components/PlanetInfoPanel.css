@@ -12,7 +12,7 @@
   padding: 20px;
   box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
   backdrop-filter: blur(10px);
-  z-index: 1000;
+  z-index: 10000; /* Molto più alto per stare sopra tutti gli altri elementi */
   overflow-y: auto;
   font-family: 'Arial', sans-serif;
   animation: slideInFromRight 0.4s ease-out;
@@ -256,23 +256,153 @@
   }
 }
 
-/* Responsive design */
+/* Responsive design - Mobile optimization */
 @media (max-width: 768px) {
   .planet-info-panel {
-    width: calc(100% - 40px);
-    right: 20px;
-    left: 20px;
-    max-height: 70vh;
+    position: fixed;
+    top: 60px; /* Sotto la search bar */
+    right: 10px;
+    left: 10px;
+    width: calc(100vw - 20px);
+    max-width: none;
+    max-height: calc(100vh - 140px); /* Lascia spazio per Add Exoplanet button */
+    padding: 15px;
+    font-size: 14px;
+    overflow-y: auto;
+    border-radius: 12px;
+    z-index: 10000; /* Mantieni z-index alto anche su mobile */
+  }
+  
+  .planet-header {
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+  }
+  
+  .planet-header h2 {
+    font-size: 1.4em;
+    line-height: 1.2;
+    max-width: calc(100% - 40px);
+    word-break: break-word;
+  }
+  
+  .close-btn {
+    font-size: 1.8em;
+    width: 28px;
+    height: 28px;
+  }
+  
+  .planet-type {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .type-badge, .disposition-badge {
+    padding: 6px 12px;
+    font-size: 0.8em;
+    min-width: auto;
+    flex: none;
   }
   
   .stat {
     flex-direction: column;
     align-items: flex-start;
-    gap: 5px;
+    gap: 4px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  }
+  
+  .stat:last-child {
+    border-bottom: none;
+  }
+  
+  .stat .label {
+    font-size: 0.9em;
+    margin-bottom: 2px;
   }
   
   .stat .value {
     text-align: left;
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+  
+  .coordinates-section {
+    padding: 10px 0;
+  }
+  
+  .coordinates-section .stat {
+    padding: 6px 0;
+  }
+  
+  .prediction-section {
+    margin-top: 15px;
+    padding: 12px;
+  }
+  
+  .prediction-header {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+  }
+  
+  .predict-btn {
+    padding: 10px 16px;
+    font-size: 0.9em;
+  }
+  
+  .prediction-result {
+    margin-top: 10px;
+    padding: 10px;
+  }
+  
+  .confidence-bar {
+    height: 6px;
+    margin: 8px 0;
+  }
+}
+
+/* Extra small devices (portrait phones) */
+@media (max-width: 480px) {
+  .planet-info-panel {
+    top: 55px; /* Sotto la search bar compatta */
+    right: 5px;
+    left: 5px;
+    width: calc(100vw - 10px);
+    padding: 12px;
+    font-size: 13px;
+    max-height: calc(100vh - 120px); /* Spazio per Add Exoplanet button */
+    z-index: 10000;
+  }
+  
+  .planet-header h2 {
+    font-size: 1.2em;
+  }
+  
+  .close-btn {
+    font-size: 1.6em;
+    width: 26px;
+    height: 26px;
+  }
+  
+  .type-badge, .disposition-badge {
+    padding: 5px 10px;
+    font-size: 0.75em;
+  }
+  
+  .stat .label {
+    font-size: 0.85em;
+  }
+  
+  .stat .value {
+    font-size: 1.05em;
+  }
+  
+  .prediction-section {
+    padding: 10px;
+  }
+  
+  .predict-btn {
+    padding: 8px 14px;
+    font-size: 0.85em;
   }
 }
 
