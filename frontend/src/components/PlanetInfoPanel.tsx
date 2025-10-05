@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { calculatePlanetSize, getPlanetCategoryColor, earthRadiiToKm, isInHabitableZone } from '../utils/planetSizeCalculations';
-import { predictExoplanet, PredictionResult, testAIConnection } from '../api/predictions';
+import { predictExoplanet, ExoplanetPredictionResponse } from '../api/predictions';
 import './PlanetInfoPanel.css';
 
 // Original fields from KOI_cleaned.csv for more details
@@ -32,48 +32,35 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
   onCompareWithEarth,
   onClose
 }) => {
-  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [prediction, setPrediction] = useState<ExoplanetPredictionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Detect mobile for responsive layout
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
-  // 🤖 Funzione per predire se è un Exoplanet
-  const handlePredictHexaplanet = async () => {
+  // 🤖 ML Prediction function for CANDIDATE planets
+  const handlePredictExoplanet = async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // 🧪 Prima testa la connessione
-      const isConnected = await testAIConnection();
-      if (!isConnected) {
-        throw new Error('Backend AI non raggiungibile');
-      }
-
       const result = await predictExoplanet({
         name: planet.name,
-        period: planet.period || planet.koi_period,
-        radius: planet.radius || planet.koi_prad,
-        eq_temp: planet.eq_temp || planet.koi_teq,
-        star_temp: planet.koi_steff,
+        period: planet.period || planet.koi_period || 0,
+        radius: planet.radius || planet.koi_prad || 0,
+        eq_temp: planet.eq_temp || planet.koi_teq || 0,
+        star_temp: planet.koi_steff || 0,
         star_radius: planet.koi_srad,
         ra: planet.ra,
         dec: planet.dec
       });
       
+      console.log('✅ ML Prediction received:', result);
       setPrediction(result);
     } catch (err) {
-      console.error('Errore predizione AI:', err);
-      if (err instanceof Error) {
-        if (err.message.includes('Backend AI non raggiungibile') || err.message.includes('fetch')) {
-          setError('🚀 Backend AI offline! Avvia il server con: uvicorn main:app --reload --port 8000');
-        } else {
-          setError('🤖 Sistema AI temporaneamente non disponibile. Il nostro team di scienziati sta calibrando i telescopi!');
-        }
-      } else {
-        setError('🤖 Errore sconosciuto nel sistema AI');
-      }
+      console.error('❌ ML Prediction error:', err);
+      setError('🤖 Unable to connect to ML prediction service. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -242,7 +229,7 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
           
           {!prediction && !error && (
             <button 
-              onClick={handlePredictHexaplanet}
+              onClick={handlePredictExoplanet}
               disabled={isLoading}
               style={{
                 width: "100%",
@@ -257,7 +244,7 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
                 transition: "all 0.3s ease"
               }}
             >
-              {isLoading ? "🔄 ANALYZING..." : "🚀 CONFRONTA ESOPLANET"}
+              {isLoading ? "🔄 ANALYZING..." : "🤖 PREDICT EXOPLANET PROBABILITY"}
             </button>
           )}
           
@@ -302,7 +289,23 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
                 fontWeight: "bold",
                 fontSize: "1rem"
               }}>
-                {prediction.is_exoplanet ? "✅ HEXAPLANET" : "❌ FALSE POSITIVE"}
+                {prediction.prediction_class}
+              </div>
+              
+              <div style={{ 
+                fontSize: "0.85rem", 
+                marginBottom: "0.6rem",
+                color: "#e0e0e0"
+              }}>
+                <strong>Exoplanet Probability:</strong> {prediction.details.interpretation.exoplanet_probability}
+              </div>
+              
+              <div style={{ 
+                fontSize: "0.85rem", 
+                marginBottom: "0.6rem",
+                color: "#e0e0e0"
+              }}>
+                <strong>False Positive Probability:</strong> {prediction.details.interpretation.false_positive_probability}
               </div>
               
               <div style={{ 
@@ -310,7 +313,7 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
                 marginBottom: "0.8rem",
                 color: "#e0e0e0"
               }}>
-                <strong>Confidence:</strong> {(prediction.confidence * 100).toFixed(1)}%
+                <strong>Model Type:</strong> {prediction.details.model_type}
               </div>
               
               <div style={{ display: "flex", gap: "0.5rem" }}>

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { predictExoplanet, PredictionResult } from "../api/predictions";
+import { predictExoplanet, ExoplanetPredictionResponse } from "../api/predictions";
 
 interface InfoPanelProps {
   planet: any;
@@ -8,7 +8,7 @@ interface InfoPanelProps {
 
 export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [prediction, setPrediction] = useState<ExoplanetPredictionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
