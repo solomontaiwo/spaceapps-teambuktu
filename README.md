@@ -1,6 +1,6 @@
 # 🌌 Exobabel - A World Away: Hunting for Exoplanets with AI
 
-[![NASA Space Apps Challenge 2024](https://img.shields.io/badge/NASA-Space%20Apps%20Challenge%202024-blue.svg)](https://www.spaceappschallenge.org/)
+[![NASA Space Apps Challenge 2025](https://img.shields.io/badge/NASA-Space%20Apps%20Challenge%202025-blue.svg)](https://www.spaceappschallenge.org/)
 [![Team Buktu](https://img.shields.io/badge/Team-Buktu-orange.svg)](https://github.com/solomontaiwo/spaceapps-teambuktu)
 [![Live Demo](https://img.shields.io/badge/🌌-Live%20Demo-green.svg)](https://exobabel.wiki/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -753,7 +753,7 @@ VITE_ENVIRONMENT=production
 
 ## 👥 **Team Buktu**
 
-**NASA Space Apps Challenge 2024 - Global Participants**
+**NASA Space Apps Challenge 2025 - Global Participants**
 
 - **🚀 Project Lead & Full-Stack Developer:** [Solomon Taiwo](https://github.com/solomontaiwo)
 - **🤖 AI/ML Engineer & Data Scientist:** [Filippo Manini](https://github.com/filippo-manini) & [Martina Frageri](https://github.com/martina-frageri)
@@ -820,7 +820,7 @@ See [EXOPLANET_IMAGES.md](EXOPLANET_IMAGES.md) for detailed attribution of all v
 
 **[🚀 Try Exobabel Live at https://exobabel.wiki/](https://exobabel.wiki/)**
 
-*Made with ❤️ by Team Buktu for NASA Space Apps Challenge 2024*
+*Made with ❤️ by Team Buktu for NASA Space Apps Challenge 2025*
 
 [![GitHub stars](https://img.shields.io/github/stars/solomontaiwo/spaceapps-teambuktu.svg?style=social&label=Star)](https://github.com/solomontaiwo/spaceapps-teambuktu)
 [![GitHub forks](https://img.shields.io/github/forks/solomontaiwo/spaceapps-teambuktu.svg?style=social&label=Fork)](https://github.com/solomontaiwo/spaceapps-teambuktu/fork)
