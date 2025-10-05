@@ -12,16 +12,14 @@ import { getAllExoplanets, getLimitedExoplanets } from "./api";
 import type { Planet } from "./types";
 import { filterPlanets, getFilterInfo } from "./utils/planetFilters";
 
-// Funzione di mapping CORRETTA per i dati del backend
+// Backend data mapping function
 function mapBackendPlanet(p: any): Planet {
-  console.log("🔍 Mapping planet data:", p); // Debug log
-
-  // Gestisce sia i dati dal database (/planets/) che dal CSV (/planets/all)
-  const isDbFormat = p.koi_prad !== undefined; // I dati dal DB hanno koi_prad, quelli dal CSV hanno radius
+  // Handles both database data (/planets/) and CSV data (/planets/all)
+  const isDbFormat = p.koi_prad !== undefined; // DB data has koi_prad, CSV data has radius
   
   if (isDbFormat) {
-    // Formato dal database (endpoint /planets/)
-    const mapped = {
+    // Database format (endpoint /planets/)
+    return {
       name: p.kepoi_name || p.name || `Planet-${p.id || Math.random().toString(36).substr(2, 9)}`,
       period: p.koi_period || 365,
       radius: p.koi_prad || 1,
@@ -29,12 +27,10 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.koi_steff || 5000,
       ra: p.ra || Math.random() * 360,
       dec: p.dec || (Math.random() - 0.5) * 180,
-      koi_disposition: p.koi_disposition || 'CANDIDATE', // Aggiunto per classificazione
+      koi_disposition: p.koi_disposition || 'CANDIDATE',
     };
   } else {
-    // Formato dal CSV (endpoint /planets/all)
-    const mapped = {
-      name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
+    // CSV format (endpoint /planets/all)
     return {
       name: p.name || `Planet-${Math.random().toString(36).substr(2, 9)}`,
       period: p.period || 365,
@@ -43,10 +39,8 @@ function mapBackendPlanet(p: any): Planet {
       star_temp: p.star_temp || 5000,
       ra: p.coordinates?.ra || Math.random() * 360,
       dec: p.coordinates?.dec || (Math.random() - 0.5) * 180,
-      koi_disposition: p.koi_disposition || 'CANDIDATE', // Aggiunto per classificazione
+      koi_disposition: p.koi_disposition || 'CANDIDATE',
     };
-    console.log("🎯 Mapped CSV planet:", mapped);
-    return mapped;
   }
 }
 
@@ -96,17 +90,16 @@ export default function App() {
         if (!isMounted) return; // Avoid state update if unmounted
         
         if (data && data.length > 0) {
-          try {
-            const mapped = data.map(mapBackendPlanet);
-            setPlanets(mapped);
-
+          const mapped = data.map(mapBackendPlanet);
+          setPlanets(mapped);
+          
           // 🚀 Remove loading immediately after success
-            setLoading(false);
+          setLoading(false);
           setTimeout(() => setFadeIn(true), 100); // Just a small delay for fade transition
-
+          
           // 🌌 Start loading all planets in background (non-blocking)
-            setTimeout(() => {
-              loadAllPlanetsInBackground();
+          setTimeout(() => {
+            loadAllPlanetsInBackground();
           }, 500); // Small delay to not interfere with initial UX
         } else {
           throw new Error("No data received");
