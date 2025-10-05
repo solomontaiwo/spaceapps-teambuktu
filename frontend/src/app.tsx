@@ -9,16 +9,17 @@ import HUD from "./components/HUD";
 import { getAllExoplanets } from "./api";
 import type { Planet } from "./types"; // Assicurati che il tipo sia corretto
 
-// Funzione di mapping per i dati del backend NASA
+// Funzione di mapping CORRETTA per i dati del backend
 function mapBackendPlanet(p: any): Planet {
   return {
-    name: p.name || "Unknown",
-    period: 365, // non hai dati su questo nel backend
-    radius: parseFloat(p.radius) || 1,
-    eq_temp: parseFloat(p.temperature) || 300,
-    star_temp: parseFloat(p.starTemperature) || 5000,
-    ra: parseFloat(p.coordinates?.ra) || 0,
-    dec: parseFloat(p.coordinates?.dec) || 0,
+    name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
+    period: p.period || 365,
+    radius: p.radius || 1,
+    eq_temp: p.eq_temp || 300,
+    star_temp: p.star_temp || 5000,
+    // Generiamo coordinate casuali per ogni pianeta
+    ra: Math.random() * 360,
+    dec: (Math.random() - 0.5) * 180,
   };
 }
 
@@ -32,12 +33,62 @@ export default function App() {
     getAllExoplanets()
       .then((data) => {
         const mapped = data.map(mapBackendPlanet);
-        console.log("✅ Pianeti caricati:", mapped.length, mapped.slice(0, 3));
+        console.log("✅ Pianeti caricati dal backend:", mapped.length, mapped.slice(0, 3));
         setPlanets(mapped);
       })
       .catch((err) => {
         console.error("❌ Errore caricamento pianeti:", err);
-        setPlanets([]);
+        // 🚀 Pianeti di test se il backend non risponde
+        const testPlanets: Planet[] = [
+          {
+            name: "Kepler-452b",
+            period: 385,
+            radius: 1.6,
+            eq_temp: 265,
+            star_temp: 5757,
+            ra: 292.1,
+            dec: 44.3
+          },
+          {
+            name: "TRAPPIST-1e",
+            period: 6.1,
+            radius: 0.92,
+            eq_temp: 251,
+            star_temp: 2559,
+            ra: 346.6,
+            dec: -5.0
+          },
+          {
+            name: "Proxima Centauri b",
+            period: 11.2,
+            radius: 1.17,
+            eq_temp: 234,
+            star_temp: 3042,
+            ra: 217.4,
+            dec: -62.7
+          },
+          {
+            name: "HD 209458 b",
+            period: 3.5,
+            radius: 8.3,
+            eq_temp: 1130,
+            star_temp: 6065,
+            ra: 330.8,
+            dec: 18.9
+          },
+          {
+            name: "Gliese 581g",
+            period: 36.6,
+            radius: 1.5,
+            eq_temp: 228,
+            star_temp: 3498,
+            ra: 229.9,
+            dec: -7.7
+          }
+        ];
+        
+        console.log("🔄 Usando pianeti di test:", testPlanets.length);
+        setPlanets(testPlanets);
       })
       .finally(() => setLoading(false));
   }, []);

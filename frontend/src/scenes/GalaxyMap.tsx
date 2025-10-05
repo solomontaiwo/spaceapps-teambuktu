@@ -2,24 +2,74 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { classifyPlanet, generateArtisticImageUrl } from "../data/planetTextures";
+import { Planet } from "../types"; // Usa il tipo corretto
 
-type Planet = {
-  name: string;
-  koi_period?: number;
-  period?: number;
-  koi_prad?: number;
-  radius?: number;
-  koi_teq?: number;
-  eq_temp?: number;
-  koi_steff?: number;
-  star_temp?: number;
-  ra?: number;
-  dec?: number;
-  sy_dist?: number;
-  koi_kepmag?: number;
-  masse?: number;
-};
+// 🔬 Sistema di classificazione planetaria scientifica
+function classifyPlanet(temp: number, radius: number) {
+  const earthRadii = radius || 1;
+  
+  let type: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'oceanic';
+  let materialProps;
+  
+  if (temp < 200) {
+    // ❄️ Pianeti gelidi
+    type = 'icy';
+    materialProps = {
+      baseColor: "#87ceeb",
+      emissiveColor: "#4682b4", 
+      atmosphereColor: "#b0e0e6",
+      roughness: 0.3,
+      metalness: 0.1,
+      iceEffects: true
+    };
+  } else if (temp > 800) {
+    // 🌋 Pianeti vulcanici
+    type = 'volcanic';
+    materialProps = {
+      baseColor: "#8b0000",
+      emissiveColor: "#ff4500",
+      atmosphereColor: "#ff6347",
+      roughness: 0.9,
+      metalness: 0.05,
+      lavaGlow: true
+    };
+  } else if (earthRadii > 4) {
+    // 🪐 Giganti gassosi
+    type = 'gaseous';
+    materialProps = {
+      baseColor: "#dda0dd",
+      emissiveColor: "#9370db",
+      atmosphereColor: "#ba55d3",
+      roughness: 0.1,
+      metalness: 0.0,
+      cloudBands: true
+    };
+  } else if (temp >= 273 && temp <= 320 && earthRadii < 2) {
+    // 🌍 Pianeti oceanici
+    type = 'oceanic';
+    materialProps = {
+      baseColor: "#006994",
+      emissiveColor: "#4169e1",
+      atmosphereColor: "#87ceeb",
+      roughness: 0.1,
+      metalness: 0.0,
+      waterReflection: true
+    };
+  } else {
+    // 🪨 Pianeti rocciosi
+    type = 'rocky';
+    materialProps = {
+      baseColor: "#cd853f",
+      emissiveColor: "#daa520",
+      atmosphereColor: "#f4a460",
+      roughness: 0.8,
+      metalness: 0.2,
+      craters: true
+    };
+  }
+  
+  return { type, ...materialProps };
+}
 
 /* -------------------- COMPONENTE ESOPIANETA -------------------- */
 function ExoPlanet({
@@ -53,67 +103,35 @@ function ExoPlanet({
 
   // 🔬 Classificazione scientifica del pianeta
   const planetClassification = useMemo(() => {
-    const temp = planet.eq_temp || planet.koi_teq || 300;
-    const earthRadii = planet.radius || planet.koi_prad || 1;
-    return classifyPlanet(temp, earthRadii, planet.star_temp);
-  }, [planet.eq_temp, planet.koi_teq, planet.radius, planet.koi_prad, planet.star_temp]);
+    const temp = planet.eq_temp || 300;
+    const earthRadii = planet.radius || 1;
+    return classifyPlanet(temp, earthRadii);
+  }, [planet.eq_temp, planet.radius]);
 
-  // 🎨 Sistema ULTRA-REALISTICO basato su classificazione scientifica
+  // 🎨 Materiali ULTRA-REALISTICI direttamente dalla classificazione
   const planetMaterials = useMemo(() => {
-    const temp = planet.eq_temp || planet.koi_teq || 300;
-    const earthRadii = planet.radius || planet.koi_prad || 1;
-    const pattern = planetClassification.pattern;
-    
-    // 🌡️ Colori basati sulla classificazione scientifica
-    let baseColor, emissiveColor, atmosphereColor;
-    
-    switch (planetClassification.type) {
-      case 'icy':
-        baseColor = "#1e40af";
-        emissiveColor = "#3b82f6";
-        atmosphereColor = "#60a5fa";
-        break;
-      case 'oceanic':
-        baseColor = "#059669";
-        emissiveColor = "#10b981";
-        atmosphereColor = "#34d399";
-        break;
-      case 'rocky':
-        baseColor = "#92400e";
-        emissiveColor = "#d97706";
-        atmosphereColor = "#fbbf24";
-        break;
-      case 'volcanic':
-        baseColor = "#991b1b";
-        emissiveColor = "#dc2626";
-        atmosphereColor = "#ef4444";
-        break;
-      case 'gaseous':
-        baseColor = "#7c3aed";
-        emissiveColor = "#8b5cf6";
-        atmosphereColor = "#a78bfa";
-        break;
-      default:
-        baseColor = "#6b7280";
-        emissiveColor = "#9ca3af";
-        atmosphereColor = "#d1d5db";
-    }
-    
     return {
-      baseColor,
-      emissiveColor,
-      atmosphereColor,
-      roughness: pattern.roughness,
-      metalness: pattern.metalness,
-      atmosphereOpacity: earthRadii > 1 ? 0.6 : 0.3,
-      bumpScale: pattern.bumpIntensity
+      baseColor: planetClassification.baseColor,
+      emissiveColor: planetClassification.emissiveColor,
+      atmosphereColor: planetClassification.atmosphereColor,
+      roughness: planetClassification.roughness,
+      metalness: planetClassification.metalness,
+      atmosphereOpacity: planet.radius > 1 ? 0.6 : 0.3,
+      // Effetti speciali per ogni tipo
+      hasSpecialEffects: {
+        iceEffects: planetClassification.type === 'icy',
+        lavaGlow: planetClassification.type === 'volcanic',
+        cloudBands: planetClassification.type === 'gaseous',
+        waterReflection: planetClassification.type === 'oceanic',
+        craters: planetClassification.type === 'rocky'
+      }
     };
-  }, [planet.eq_temp, planet.koi_teq, planet.radius, planet.koi_prad, planetClassification]);
+  }, [planetClassification, planet.radius]);
 
   // 📏 Raggio REALISTICO del pianeta in scala astronomica PIÙ GRANDE
   const radius = useMemo(() => {
     // Usa il raggio dal backend (già in raggi terrestri)
-    const earthRadii = planet.radius || planet.koi_prad || 1;
+    const earthRadii = planet.radius || 1;
     
     // 🌍 Scala realistica AMPLIFICATA per migliore visibilità
     let visualRadius;
@@ -137,19 +155,19 @@ function ExoPlanet({
     
     // Limiti ampliati per migliore visibilità
     return Math.max(0.3, Math.min(8.0, visualRadius));
-  }, [planet.radius, planet.koi_prad]);
+  }, [planet.radius]);
 
   // 🔄 Animazione REALISTICA di rotazione e orbita
   useFrame((_, delta) => {
     if (!meshRef.current || !orbitRef.current) return;
     
     // 🌍 ROTAZIONE DEL PIANETA (giorno)
-    const rotationPeriod = planet.period || planet.koi_period || 24; // ore
+    const rotationPeriod = planet.period || 24; // ore
     const rotationSpeed = (timeFlow * delta) / (rotationPeriod * 3600); // converti ore in secondi
     meshRef.current.rotation.y += rotationSpeed * 0.1; // Rotazione realistica ma visibile
     
     // 🪐 MOVIMENTO ORBITALE (anno)
-    const orbitalPeriod = (planet.period || planet.koi_period || 365) * 24; // giorni -> ore
+    const orbitalPeriod = planet.period * 24; // giorni -> ore
     const orbitalSpeed = (timeFlow * delta) / (orbitalPeriod * 3600); // converti in secondi
     orbitRef.current.rotation.y += orbitalSpeed * 0.05; // Movimento orbitale più lento
     
@@ -165,7 +183,7 @@ function ExoPlanet({
   const isSelected = selected?.name === planet.name;
   
   // 🌍 Calcola i raggi terrestri per effetti materiali
-  const earthRadii = planet.radius || planet.koi_prad || 1;
+  const earthRadii = planet.radius || 1;
 
   return (
     <group ref={orbitRef}>
@@ -189,27 +207,24 @@ function ExoPlanet({
           emissiveIntensity={isSelected ? 0.4 : 0.2}
           roughness={planetMaterials.roughness}
           metalness={planetMaterials.metalness}
-          bumpScale={planetMaterials.bumpScale}
-          // Effetti procedurali per texture realistica
+          // Rilievi naturali per pianeti rocciosi
           normalScale={new THREE.Vector2(
-            planetMaterials.bumpScale,
-            planetMaterials.bumpScale
+            planetClassification.type === 'rocky' ? 0.3 : 0.1,
+            planetClassification.type === 'rocky' ? 0.3 : 0.1
           )}
         />
         
-        {/* 🔗 Metadati scientifici invisibili per il sistema */}
+        {/* 🔗 Metadati scientifici per il sistema */}
         <mesh visible={false} userData={{
           planetType: planetClassification.type,
-          habitability: planetClassification.habitability,
-          temperature: planet.eq_temp || planet.koi_teq || 300,
+          temperature: planet.eq_temp || 300,
           earthComparison: {
             sizeRatio: earthRadii,
-            tempDiff: (planet.eq_temp || planet.koi_teq || 300) - 288,
-            artisticImageUrl: generateArtisticImageUrl(
-              planet.name, 
-              planet.eq_temp || planet.koi_teq || 300, 
-              earthRadii
-            )
+            tempDiff: (planet.eq_temp || 300) - 288,
+            isHabitable: 
+              (planet.eq_temp || 300) >= 273 && 
+              (planet.eq_temp || 300) <= 320 &&
+              earthRadii < 3
           }
         }} />
         
@@ -226,17 +241,100 @@ function ExoPlanet({
           />
         </mesh>
         
-        {/* 🌤️ NUVOLE ATMOSFERICHE (solo per pianeti con atmosfera) */}
-        {earthRadii > 0.8 && planetMaterials.atmosphereOpacity > 0.3 && (
-          <mesh position={[0, 0, 0]}>
-            <sphereGeometry args={[radius * 1.05, 24, 24]} />
-            <meshStandardMaterial
-              color="#ffffff"
-              transparent
-              opacity={0.4}
-              alphaTest={0.1}
-            />
-          </mesh>
+        {/* 🌤️ EFFETTI SPECIALI REALISTICI basati sul tipo di pianeta */}
+        {planetClassification.type === 'gaseous' && (
+          <>
+            {/* 🌪️ Bande nuvolose per giganti gassosi */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.02, 32, 16]} />
+              <meshStandardMaterial
+                color="#e6e6fa"
+                transparent
+                opacity={0.7}
+                alphaTest={0.3}
+              />
+            </mesh>
+            {/* 🌀 Tempeste atmosferiche */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.01, 16, 8]} />
+              <meshBasicMaterial
+                color="#ff6347"
+                transparent
+                opacity={0.3}
+              />
+            </mesh>
+          </>
+        )}
+        
+        {planetClassification.type === 'icy' && (
+          <>
+            {/* ❄️ Riflessi ghiacciati */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.01, 32, 32]} />
+              <meshStandardMaterial
+                color="#e0ffff"
+                transparent
+                opacity={0.6}
+                metalness={0.8}
+                roughness={0.1}
+              />
+            </mesh>
+          </>
+        )}
+        
+        {planetClassification.type === 'volcanic' && (
+          <>
+            {/* 🌋 Bagliori vulcanici */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.005, 24, 24]} />
+              <meshStandardMaterial
+                color="#ff4500"
+                emissive="#ff0000"
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.8}
+              />
+            </mesh>
+          </>
+        )}
+        
+        {planetClassification.type === 'oceanic' && (
+          <>
+            {/* 🌊 Riflessi oceanici */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.001, 32, 32]} />
+              <meshStandardMaterial
+                color="#4169e1"
+                transparent
+                opacity={0.7}
+                metalness={0.9}
+                roughness={0.05}
+              />
+            </mesh>
+            {/* ☁️ Nuvole d'acqua */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.06, 20, 20]} />
+              <meshStandardMaterial
+                color="#ffffff"
+                transparent
+                opacity={0.5}
+              />
+            </mesh>
+          </>
+        )}
+        
+        {planetClassification.type === 'rocky' && (
+          <>
+            {/* 🪨 Atmosfera sottile per pianeti rocciosi */}
+            <mesh position={[0, 0, 0]}>
+              <sphereGeometry args={[radius * 1.03, 24, 24]} />
+              <meshStandardMaterial
+                color="#daa520"
+                transparent
+                opacity={0.2}
+              />
+            </mesh>
+          </>
         )}
         <mesh position={[0, 0, 0]}>
           <ringGeometry args={[radius * 3, radius * 3.5, 64]} />
@@ -282,14 +380,14 @@ function ExoPlanet({
               <sphereGeometry args={[0.2, 8, 8]} />
               <meshStandardMaterial
                 color={
-                  (planet.eq_temp || planet.koi_teq || 300) >= 273 && 
-                  (planet.eq_temp || planet.koi_teq || 300) <= 320 
+                  (planet.eq_temp || 300) >= 273 && 
+                  (planet.eq_temp || 300) <= 320 
                     ? "#00ff00"  // Verde = zona abitabile
                     : "#ff0000"  // Rosso = non abitabile
                 }
                 emissive={
-                  (planet.eq_temp || planet.koi_teq || 300) >= 273 && 
-                  (planet.eq_temp || planet.koi_teq || 300) <= 320 
+                  (planet.eq_temp || 300) >= 273 && 
+                  (planet.eq_temp || 300) <= 320 
                     ? "#00ff00" 
                     : "#ff0000"
                 }
@@ -332,11 +430,30 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
       }}
       style={{ width: '100%', height: '100%' }}
     >
-      {/* 🔥 ILLUMINAZIONE OTTIMIZZATA */}
-      <ambientLight intensity={0.4} color="#1a1a3e" />
-      <pointLight position={[0, 0, 0]} intensity={1.0} color="#ffffff" />
-      <pointLight position={[200, 200, 200]} intensity={0.6} color="#ffeeaa" />
-      <pointLight position={[-200, -200, -200]} intensity={0.6} color="#aaeeff" />
+      {/* 🌟 ILLUMINAZIONE REALISTICA per dettagli 3D */}
+      <ambientLight intensity={0.3} color="#1a1a3e" />
+      
+      {/* ☀️ Luce solare principale */}
+      <directionalLight 
+        position={[100, 100, 100]} 
+        intensity={1.2} 
+        color="#ffffff"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+      />
+      
+      {/* 🌅 Luci secondarie per illuminazione diffusa */}
+      <pointLight position={[0, 0, 0]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[300, 200, 200]} intensity={0.5} color="#ffeeaa" />
+      <pointLight position={[-300, -200, -200]} intensity={0.5} color="#aaeeff" />
+      
+      {/* 🌌 Luce galattica di fondo */}
+      <hemisphereLight 
+        color="#4a5568" 
+        groundColor="#1a202c" 
+        intensity={0.2} 
+      />
 
       {/* 🌌 Griglia di riferimento astronomica MASSIMA ESTENSIONE */}
       <gridHelper args={[1500, 150, "#444477", "#333355"]} position={[0, 0, 0]} />

@@ -1,0 +1,129 @@
+/* Stili per il pannello informazioni pianeta */
+.planet-info-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 80vh;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #444;
+  border-radius: 10px;
+  padding: 20px;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  z-index: 1000;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.planet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.planet-header h2 {
+  margin: 0;
+  color: #60a5fa;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: #dc2626;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.planet-stats {
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #333;
+}
+
+.label {
+  font-weight: bold;
+  color: #d1d5db;
+}
+
+.value {
+  color: #f3f4f6;
+}
+
+.habitable {
+  color: #10b981 !important;
+  font-weight: bold;
+}
+
+.not-habitable {
+  color: #ef4444 !important;
+  font-weight: bold;
+}
+
+.planet-description {
+  margin-bottom: 20px;
+}
+
+.planet-description h3 {
+  color: #fbbf24;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.planet-description ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.planet-description li {
+  margin-bottom: 5px;
+  padding-left: 5px;
+  color: #e5e7eb;
+  line-height: 1.4;
+}
+
+.compare-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(45deg, #10b981, #3b82f6);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.compare-btn:hover {
+  background: linear-gradient(45deg, #059669, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
