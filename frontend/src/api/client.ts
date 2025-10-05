@@ -1,5 +1,8 @@
-const BASE_URL = "https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net";
-const API = BASE_URL; // Backend Azure endpoint
+// 🔧 For local development: set to "http://localhost:8000"
+// 🚀 For production: use Azure URL
+const BASE_URL = "http://localhost:8000"; // Change to Azure URL when deploying
+// const BASE_URL = "https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net";
+const API = BASE_URL; // Backend endpoint
 
 async function handle(res: Response) {
   if (!res.ok) {

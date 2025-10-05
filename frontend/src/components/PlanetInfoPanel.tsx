@@ -11,11 +11,17 @@ interface PlanetData {
   period: number;          
   eq_temp: number;        
   koi_disposition?: string;
+  // All KOI fields
   koi_prad?: number;
   koi_period?: number;
   koi_teq?: number;
   koi_steff?: number;
   koi_srad?: number;
+  koi_slogg?: number;
+  koi_kepmag?: number;
+  koi_duration?: number;
+  koi_depth?: number;
+  koi_insol?: number;
   ra?: number;
   dec?: number;
   source?: string;
@@ -46,14 +52,18 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
     
     try {
       const result = await predictExoplanet({
-        name: planet.name,
-        period: planet.period || planet.koi_period || 0,
-        radius: planet.radius || planet.koi_prad || 0,
-        eq_temp: planet.eq_temp || planet.koi_teq || 0,
-        star_temp: planet.koi_steff || 0,
-        star_radius: planet.koi_srad,
-        ra: planet.ra,
-        dec: planet.dec
+        //ra: planet.ra,
+        //dec: planet.dec,
+        koi_steff: planet.koi_steff,
+        koi_slogg: planet.koi_slogg,
+        koi_srad: planet.koi_srad,
+        koi_kepmag: planet.koi_kepmag,
+        koi_period: planet.koi_period,
+        koi_duration: planet.koi_duration,
+        koi_depth: planet.koi_depth,
+        koi_prad: planet.koi_prad,
+        koi_insol: planet.koi_insol,
+        koi_teq: planet.koi_teq
       });
       
       console.log('✅ ML Prediction received:', result);
@@ -294,26 +304,10 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
               
               <div style={{ 
                 fontSize: "0.85rem", 
-                marginBottom: "0.6rem",
-                color: "#e0e0e0"
-              }}>
-                <strong>Exoplanet Probability:</strong> {prediction.details.interpretation.exoplanet_probability}
-              </div>
-              
-              <div style={{ 
-                fontSize: "0.85rem", 
-                marginBottom: "0.6rem",
-                color: "#e0e0e0"
-              }}>
-                <strong>False Positive Probability:</strong> {prediction.details.interpretation.false_positive_probability}
-              </div>
-              
-              <div style={{ 
-                fontSize: "0.85rem", 
                 marginBottom: "0.8rem",
                 color: "#e0e0e0"
               }}>
-                <strong>Model Type:</strong> {prediction.details.model_type}
+                <strong>Confidence:</strong> {(prediction.confidence * 100).toFixed(1)}%
               </div>
               
               <div style={{ display: "flex", gap: "0.5rem" }}>

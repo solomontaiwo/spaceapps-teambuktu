@@ -76,8 +76,14 @@ def import_koi_cleaned():
             
             # Trova gli indici delle colonne che ci interessano
             col_indices = {}
-            required_cols = ['koi_disposition', 'ra', 'dec', 'koi_steff', 'koi_srad', 
-                           'koi_period', 'koi_prad', 'koi_teq', 'source']
+            # TUTTE le colonne dal CSV, incluse le nuove
+            required_cols = [
+                'koi_disposition', 'RA', 'Dec', 
+                'koi_steff', 'koi_slogg', 'koi_srad', 'koi_kepmag',
+                'koi_period', 'koi_duration', 'koi_depth', 
+                'koi_prad', 'koi_insol', 'koi_teq',
+                'source'
+            ]
             
             for i, col in enumerate(columns):
                 if col in required_cols:
@@ -118,16 +124,24 @@ def import_koi_cleaned():
                         errors += 1
                         continue
                     
-                    # Crea il pianeta con i dati corretti
+                    # Crea il pianeta con TUTTI i dati dal CSV
                     planet = Planet(
                         koi_disposition=disposition,
-                        ra=safe_float(get_value('ra')),
-                        dec=safe_float(get_value('dec')),
+                        ra=safe_float(get_value('RA')),
+                        dec=safe_float(get_value('Dec')),
+                        # Proprietà stellari
                         koi_steff=safe_float(get_value('koi_steff')),
+                        koi_slogg=safe_float(get_value('koi_slogg')),
                         koi_srad=safe_float(get_value('koi_srad')),
+                        koi_kepmag=safe_float(get_value('koi_kepmag')),
+                        # Proprietà planetarie
                         koi_period=safe_float(get_value('koi_period')),
+                        koi_duration=safe_float(get_value('koi_duration')),
+                        koi_depth=safe_float(get_value('koi_depth')),
                         koi_prad=safe_float(get_value('koi_prad'), 1.0),  # Default 1.0 per compatibilità
+                        koi_insol=safe_float(get_value('koi_insol')),
                         koi_teq=safe_float(get_value('koi_teq')),
+                        # Metadata
                         source=safe_str(get_value('source'), "Kepler")
                     )
                     

@@ -6,18 +6,24 @@ class Planet(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     # Coordinate celesti
-    ra = Column(Float, index=True)  # Right Ascension
-    dec = Column(Float, index=True)  # Declination
+    ra = Column(Float, index=True)  # Right Ascension (RA)
+    dec = Column(Float, index=True)  # Declination (Dec)
     
     # Proprietà planetarie (dal CSV KOI_cleaned.csv)
     koi_disposition = Column(String, index=True)  # CONFIRMED, CANDIDATE, FALSE POSITIVE
-    koi_period = Column(Float, index=True)  # Periodo orbitale
-    koi_prad = Column(Float, index=True)  # Raggio planetario (IMPORTANTE per dimensioni 3D)
-    koi_teq = Column(Float, index=True)  # Temperatura di equilibrio
+    koi_period = Column(Float, index=True)  # Periodo orbitale (giorni)
+    koi_prad = Column(Float, index=True)  # Raggio planetario (Earth radii)
+    koi_teq = Column(Float, index=True)  # Temperatura di equilibrio (K)
+    koi_duration = Column(Float)  # Durata del transito (ore)
+    koi_depth = Column(Float)  # Profondità del transito (ppm)
+    koi_insol = Column(Float)  # Insolazione (flusso stellare ricevuto, Earth flux)
     
     # Proprietà stellari
-    koi_steff = Column(Float, index=True)  # Temperatura stellare
-    koi_srad = Column(Float, index=True)  # Raggio stellare
+    koi_steff = Column(Float, index=True)  # Temperatura stellare effettiva (K)
+    koi_srad = Column(Float, index=True)  # Raggio stellare (solar radii)
+    koi_slogg = Column(Float)  # Gravità superficiale stellare (log10(cm/s^2))
+    koi_kepmag = Column(Float)  # Magnitudine Kepler
+    
     source = Column(String)  # Sorgente (es. Kepler)
     
     # Campi di compatibilità per il frontend

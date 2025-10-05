@@ -21,14 +21,18 @@ export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
     
     try {
       const result = await predictExoplanet({
-        name: planet.name,
-        period: planet.period,
-        radius: planet.radius,
-        eq_temp: planet.eq_temp,
-        star_temp: planet.star_temp,
-        star_radius: planet.star_radius,
         ra: planet.ra,
-        dec: planet.dec
+        dec: planet.dec,
+        koi_steff: planet.koi_steff,
+        koi_slogg: planet.koi_slogg,
+        koi_srad: planet.koi_srad,
+        koi_kepmag: planet.koi_kepmag,
+        koi_period: planet.koi_period,
+        koi_duration: planet.koi_duration,
+        koi_depth: planet.koi_depth,
+        koi_prad: planet.koi_prad,
+        koi_insol: planet.koi_insol,
+        koi_teq: planet.koi_teq
       });
       
       setPrediction(result);
