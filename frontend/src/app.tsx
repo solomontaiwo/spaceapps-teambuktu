@@ -814,11 +814,11 @@ export default function App() {
         onSelect={setSelectedPlanet}
       />
 
-      {/* Legenda dei pianeti */}
-      <PlanetLegend />
+      {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
+      <PlanetLegend hidden={selectedPlanet !== null} />
 
-      {/* HUD and controls */}
-      <HUD>
+      {/* HUD and controls - nascosto quando un pianeta è selezionato */}
+      <HUD hidden={selectedPlanet !== null}>
         <SearchBar
           slot="top"
           onSearch={(q) => {

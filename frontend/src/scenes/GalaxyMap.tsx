@@ -2,7 +2,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { Planet } from "../types"; // Usa il tipo corretto
+import { Planet } from "../types";
 import { 
   calculatePlanetSize, 
   getPlanetCategoryColor, 

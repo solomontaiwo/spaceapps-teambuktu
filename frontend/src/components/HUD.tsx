@@ -2,9 +2,10 @@ import { ReactNode, Children } from "react";
 
 type HUDProps = {
   children: ReactNode;
+  hidden?: boolean;
 };
 
-export default function HUD({ children }: HUDProps) {
+export default function HUD({ children, hidden = false }: HUDProps) {
   // Permette di gestire anche singolo child
   const allChildren = Children.toArray(children) as any[];
 
@@ -35,25 +36,27 @@ export default function HUD({ children }: HUDProps) {
         pointerEvents: "none",
         padding: "10px",
         boxSizing: "border-box",
+        opacity: hidden ? 0 : 1,
+        visibility: hidden ? "hidden" : "visible",
+        transition: "opacity 0.3s ease-in-out, visibility 0.3s ease-in-out",
       }}
     >
-      {/* Sezione superiore */}
+      {/* Sezione superiore - Layout a quattro angoli su mobile e desktop */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
           gap: "10px",
-          flexWrap: "wrap",
-          pointerEvents: "auto",
-          paddingRight: typeof window !== 'undefined' && window.innerWidth <= 768 ? "10px" : "300px", // Responsive padding
+          pointerEvents: hidden ? "none" : "auto",
         }}
       >
-        {/* Top center */}
-        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        {/* Top left - SearchBar */}
+        <div style={{ display: "flex", gap: "10px" }}>
           {topChildren}
         </div>
-        {/* Top right */}
+        
+        {/* Top right - Filter */}
         <div style={{ display: "flex", gap: "10px" }}>
           {topRightChildren}
         </div>
@@ -66,8 +69,7 @@ export default function HUD({ children }: HUDProps) {
           justifyContent: "space-between",
           alignItems: "flex-end",
           gap: "10px",
-          flexWrap: "wrap",
-          pointerEvents: "auto",
+          pointerEvents: hidden ? "none" : "auto",
         }}
       >
         <div>{bottomLeftChildren}</div>

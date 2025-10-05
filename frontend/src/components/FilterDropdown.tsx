@@ -59,22 +59,22 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          background: "rgba(0, 0, 0, 0.8)", // Stesso dark theme dell'InfoPanel
-          border: "1px solid rgba(255,255,255,0.2)", // Stesso border dell'InfoPanel
-          borderRadius: 10, // Stesso border radius dell'InfoPanel
-          padding: isMobile ? "6px 12px" : "8px 16px", // Padding ridotto su mobile
-          boxShadow: "0 0 15px rgba(0,0,0,0.6)", // Stesso shadow dell'InfoPanel
+          background: "rgba(0, 0, 0, 0.8)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: 10,
+          padding: isMobile ? "8px 12px" : "8px 16px",
+          boxShadow: "0 0 15px rgba(0,0,0,0.6)",
           cursor: "pointer",
           fontWeight: 600,
-          fontSize: isMobile ? "12px" : "14px", // Font più piccolo su mobile
-          color: "#ffffff", // Testo bianco come InfoPanel
-          fontFamily: "Arial, sans-serif", // Stesso font dell'InfoPanel
+          fontSize: isMobile ? "13px" : "14px",
+          color: "#ffffff",
+          fontFamily: "Arial, sans-serif",
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          minWidth: isMobile ? "150px" : "200px", // Larghezza ridotta su mobile
+          minWidth: isMobile ? "140px" : "200px", // Larghezza minima compatta su mobile
           justifyContent: "space-between",
-          transition: "all 0.3s ease-in-out", // Stessa transizione dell'InfoPanel
+          transition: "all 0.3s ease-in-out",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = "rgba(0, 0, 0, 0.9)";
@@ -85,13 +85,20 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
           e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
         }}
       >
-        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          🔽 {filterLabels[currentFilter]}
+        <span style={{ 
+          whiteSpace: "nowrap", 
+          overflow: "hidden", 
+          textOverflow: "ellipsis",
+          flex: 1,
+          textAlign: "left"
+        }}>
+          {isMobile ? "🔽" : "🔽"} {isMobile && currentFilter === "none" ? "Filter" : filterLabels[currentFilter]}
         </span>
         <span style={{ 
           transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
           transition: "transform 0.2s ease",
-          color: "#4dabf7" // Colore accent dell'InfoPanel
+          color: "#4dabf7",
+          flexShrink: 0
         }}>
           ▼
         </span>
@@ -103,18 +110,21 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
           style={{
             position: "absolute",
             top: "100%",
+            // Sempre allineato a destra
             right: 0,
-            marginTop: "8px", // Aumentato per evitare overlap
-            background: "rgba(0, 0, 0, 0.8)", // Stesso background dell'InfoPanel
-            border: "1px solid rgba(255,255,255,0.2)", // Stesso border dell'InfoPanel
-            borderRadius: 10, // Stesso border radius dell'InfoPanel
-            boxShadow: "0 0 15px rgba(0,0,0,0.6)", // Stesso shadow dell'InfoPanel
+            marginTop: "8px",
+            background: "rgba(0, 0, 0, 0.95)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            borderRadius: 10,
+            boxShadow: "0 0 15px rgba(0,0,0,0.6)",
             overflow: "hidden",
-            minWidth: isMobile ? "170px" : "220px", // Larghezza ridotta su mobile
-            maxWidth: isMobile ? "250px" : "300px", // Larghezza massima su mobile
-            fontFamily: "Arial, sans-serif", // Stesso font dell'InfoPanel
-            transition: "all 0.3s ease-in-out", // Stessa transizione dell'InfoPanel
-            backdropFilter: "blur(5px)", // Leggero blur per glass effect
+            minWidth: isMobile ? "200px" : "220px",
+            maxWidth: isMobile ? "calc(100vw - 40px)" : "300px",
+            fontFamily: "Arial, sans-serif",
+            transition: "all 0.3s ease-in-out",
+            backdropFilter: "blur(10px)",
+            maxHeight: isMobile ? "60vh" : "auto",
+            overflowY: isMobile ? "auto" : "visible",
           }}
         >
           {(Object.keys(filterLabels) as FilterType[]).map((filter) => (
