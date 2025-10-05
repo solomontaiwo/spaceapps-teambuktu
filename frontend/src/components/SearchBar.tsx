@@ -8,6 +8,7 @@ type SearchBarProps = {
 export default function SearchBar({ onSearch, slot }: SearchBarProps) {
   const [q, setQ] = useState("");
   const [expanded, setExpanded] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   // Determina se siamo su mobile (semplificato per questo esempio)
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -24,26 +25,33 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
     if (isMobile && !q.trim()) {
       setExpanded(false);
     }
+    // Nasconde il tooltip dopo un breve delay per permettere l'interazione
+    setTimeout(() => setShowHint(false), 100);
   };
 
   return (
     <div
       style={{
-        background: "rgba(0,0,0,0.7)",
-        borderRadius: 12,
-        padding: "6px 10px",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
-        backdropFilter: "blur(10px)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        display: "flex",
-        gap: 8,
-        alignItems: "center",
-        transition: "all 0.3s ease",
-        width: (!isMobile || expanded) ? "auto" : "44px", // Larghezza adattiva
-        overflow: "hidden"
+        position: "relative" // Per posizionare il tooltip
       }}
       {...(slot ? { slot } : {})}
     >
+      <div
+        style={{
+          background: "rgba(0,0,0,0.7)",
+          borderRadius: 12,
+          padding: "6px 10px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          transition: "all 0.3s ease",
+          width: (!isMobile || expanded) ? "auto" : "44px", // Larghezza adattiva
+          overflow: "hidden"
+        }}
+      >
       {/* Icona lente sempre visibile */}
       <button
         onClick={handleIconClick}
@@ -69,15 +77,18 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search exoplanet…"
+            placeholder="🔍 Search by name or ID (e.g. KOI-123)..."
             autoFocus={expanded}
             onBlur={handleBlur}
+            onFocus={() => setShowHint(true)}
+            onMouseEnter={() => setShowHint(true)}
+            onMouseLeave={() => setShowHint(false)}
             className="search-input"
             style={{
               border: "none",
               outline: "none",
               background: "transparent",
-              width: 180,
+              width: 200, // Aumentato per il testo più lungo
               fontSize: "14px",
               color: "#fff"
             }}
@@ -85,10 +96,12 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
               if (e.key === "Enter" && q.trim()) {
                 onSearch(q);
                 if (isMobile) setExpanded(false);
+                setShowHint(false);
               }
               if (e.key === "Escape" && isMobile) {
                 setExpanded(false);
                 setQ("");
+                setShowHint(false);
               }
             }}
           />
@@ -115,6 +128,29 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
             Search
           </button>
         </>
+      )}
+      </div>
+      
+      {/* 💡 Tooltip con suggerimenti per la ricerca */}
+      {showHint && (
+        <div
+          style={{
+            position: "absolute",
+            top: "110%",
+            left: 0,
+            background: "rgba(0,0,0,0.9)",
+            borderRadius: 8,
+            padding: "8px 12px",
+            fontSize: "12px",
+            color: "#fff",
+            whiteSpace: "nowrap",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            zIndex: 1000
+          }}
+        >
+          💡 Try: "KOI-1", "123", "ross", "kepler-452b"
+        </div>
       )}
     </div>
   );

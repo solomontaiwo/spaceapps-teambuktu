@@ -467,16 +467,118 @@ interface GalaxyMapProps {
   selected: Planet | null;
   onSelect: (planet: Planet | null) => void;
   onCompareWithEarth?: (planet: Planet) => void; // 🌍 Callback per confronto con la Terra
+  zoomToPlanet?: Planet | null; // 🎯 Pianeta su cui zoomare
 }
 
 const GalaxyMap: React.FC<GalaxyMapProps> = ({ 
   planets, 
   selected, 
   onSelect, 
-  onCompareWithEarth 
+  onCompareWithEarth,
+  zoomToPlanet
 }) => {
   const controlsRef = useRef<any>(null);
   const filtered = useMemo(() => planets.slice(0, 200), [planets]);
+
+  // 🎯 Funzione per calcolare la posizione di un pianeta (stessa logica di ExoPlanet)
+  const calculatePlanetPosition = (planet: Planet): THREE.Vector3 => {
+    // Usa il nome del pianeta per generare una posizione stabile ma pseudo-casuale
+    const hash = planet.name.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    
+    // Normalizza l'hash per ottenere valori tra 0 e 1
+    const seed1 = Math.abs(hash) / 2147483647;
+    const seed2 = Math.abs(hash * 1.5) / 2147483647;
+    const seed3 = Math.abs(hash * 2.3) / 2147483647;
+    
+    // 🌌 PARAMETRI SPIRALE GALATTICA - DISTRIBUZIONE ESTREMA
+    const galaxyRadius = 1500;       // 🚀 RAGGIO MOLTO PIÙ GRANDE per dispersione estrema
+    const spiralArms = 4;            // Numero di bracci spirale
+    const spiralTightness = 0.8;     // 🚀 MOLTO più larghi i bracci
+    const coreRadius = 100;          // 🚀 Nucleo più grande
+    const galaxyThickness = 600;     // 🚀 SPESSORE ENORME per dispersione Y
+    
+    // 🚀 DISTRIBUZIONE ESTREMA - Meno concentrata al centro
+    const r = Math.pow(seed1, 0.3) * galaxyRadius + coreRadius; // Meno concentrazione centrale
+    
+    // 🚀 ANGOLO MOLTO PIÙ CASUALE
+    const baseAngle = seed2 * Math.PI * 4; // Doppio giro completo
+    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 2); // 🚀 MOLTA più variazione casuale
+    const armIndex = Math.floor(seed3 * spiralArms);
+    const armAngle = (armIndex * Math.PI * 2) / spiralArms;
+    const totalAngle = baseAngle + spiralOffset + armAngle;
+    
+    // 🚀 COORDINATE CON DISPERSIONE ESTREMA
+    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 400; // +/- 200 di variazione extra
+    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 400; // +/- 200 di variazione extra
+    
+    // 🚀 ALTEZZA: DISTRIBUZIONE COMPLETAMENTE CASUALE su Y
+    const heightVariation = (seed1 + seed2 + seed3) / 3;
+    const heightMultiplier = 3.0; // 🚀 TRIPLICATO per dispersione estrema Y
+    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 300; // Extra randomness
+    
+    return new THREE.Vector3(x, y, z);
+  };
+
+  // 🎯 Effetto per zoomare verso un pianeta quando richiesto
+  useEffect(() => {
+    if (zoomToPlanet && controlsRef.current) {
+      const targetPosition = calculatePlanetPosition(zoomToPlanet);
+      const controls = controlsRef.current;
+      
+      // 📷 Calcola posizione della camera (dietro e leggermente sopra il pianeta)
+      const planetRadius = (zoomToPlanet.radius || 1) * 3; // Raggio visuale del pianeta
+      const cameraDistance = Math.max(50, planetRadius * 8); // Distanza appropriata
+      
+      // 📍 Posizione target per la camera (dietro il pianeta)
+      const cameraOffset = new THREE.Vector3(
+        targetPosition.x + cameraDistance * 0.7,
+        targetPosition.y + cameraDistance * 0.3,
+        targetPosition.z + cameraDistance
+      );
+      
+      console.log(`🎯 Zooming to planet: ${zoomToPlanet.name}`);
+      console.log(`📍 Planet position:`, targetPosition);
+      console.log(`📷 Camera position:`, cameraOffset);
+      
+      // 🎬 Animazione fluida della camera
+      const startPosition = controls.object.position.clone();
+      const startTarget = controls.target.clone();
+      const duration = 2000; // 2 secondi
+      const startTime = Date.now();
+      
+      const animateCamera = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // 📈 Easing (smooth in/out)
+        const easeProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+        
+        // 📷 Interpola posizione camera
+        controls.object.position.lerpVectors(startPosition, cameraOffset, easeProgress);
+        
+        // 🎯 Interpola target (centro del pianeta)
+        controls.target.lerpVectors(startTarget, targetPosition, easeProgress);
+        
+        // 📱 Update dei controlli
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateCamera);
+        } else {
+          console.log(`✅ Zoom completed to ${zoomToPlanet.name}`);
+          // 🔄 Reset zoom trigger dopo l'animazione per evitare loop
+          setTimeout(() => {
+            // Nota: questo deve essere gestito dal componente parent
+          }, 100);
+        }
+      };
+      
+      animateCamera();
+    }
+  }, [zoomToPlanet]);
 
   // 🔍 Debug: mostra statistiche quando i pianeti cambiano
   useEffect(() => {
