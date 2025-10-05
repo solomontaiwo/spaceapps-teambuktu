@@ -121,7 +121,7 @@ function ExoPlanet({
   const meshRef = useRef<THREE.Mesh>(null);
   const orbitRef = useRef<THREE.Group>(null);
 
-  // � POSIZIONAMENTO A SPIRALE GALATTICA REALISTICA
+  // � POSIZIONAMENTO A SPIRALE GALATTICA BILANCIATA
   const position = useMemo(() => {
     // Usa il nome del pianeta per generare una posizione stabile ma pseudo-casuale
     const hash = planet.name.split('').reduce((a, b) => {
@@ -134,31 +134,31 @@ function ExoPlanet({
     const seed2 = Math.abs(hash * 1.5) / 2147483647;
     const seed3 = Math.abs(hash * 2.3) / 2147483647;
     
-    // 🌌 PARAMETRI SPIRALE GALATTICA - DISTRIBUZIONE ESTREMA
-    const galaxyRadius = 1500;       // 🚀 RAGGIO MOLTO PIÙ GRANDE per dispersione estrema
+    // 🌌 PARAMETRI SPIRALE GALATTICA - DISTRIBUZIONE BILANCIATA
+    const galaxyRadius = 1200;       // 🚀 Ridotto per meno dispersione estrema
     const spiralArms = 4;            // Numero di bracci spirale
-    const spiralTightness = 0.8;     // 🚀 MOLTO più larghi i bracci
-    const coreRadius = 100;          // 🚀 Nucleo più grande
-    const galaxyThickness = 600;     // 🚀 SPESSORE ENORME per dispersione Y
+    const spiralTightness = 0.6;     // 🚀 Bracci più definiti
+    const coreRadius = 80;           // 🚀 Nucleo controllato
+    const galaxyThickness = 400;     // 🚀 Spessore Y controllato
     
-    // 🚀 DISTRIBUZIONE ESTREMA - Meno concentrata al centro
-    const r = Math.pow(seed1, 0.3) * galaxyRadius + coreRadius; // Meno concentrazione centrale
+    // 🚀 DISTRIBUZIONE BILANCIATA - Evita "schegge impazzite"
+    const r = Math.pow(seed1, 0.4) * galaxyRadius + coreRadius; // Distribuzione più organica
     
-    // 🚀 ANGOLO MOLTO PIÙ CASUALE
-    const baseAngle = seed2 * Math.PI * 4; // Doppio giro completo
-    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 2); // 🚀 MOLTA più variazione casuale
+    // 🚀 ANGOLO CONTROLLATO - No più dispersioni estreme
+    const baseAngle = seed2 * Math.PI * 2; // Un giro completo
+    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 1.5); // Variazione controllata
     const armIndex = Math.floor(seed3 * spiralArms);
     const armAngle = (armIndex * Math.PI * 2) / spiralArms;
     const totalAngle = baseAngle + spiralOffset + armAngle;
     
-    // 🚀 COORDINATE CON DISPERSIONE ESTREMA
-    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 400; // +/- 200 di variazione extra
-    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 400; // +/- 200 di variazione extra
+    // 🚀 COORDINATE CONTROLLATE - Evita pianeti "volanti"
+    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 200; // Ridotta variazione
+    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 200; // Ridotta variazione
     
-    // 🚀 ALTEZZA: DISTRIBUZIONE COMPLETAMENTE CASUALE su Y
+    // 🚀 ALTEZZA BILANCIATA su Y - No più dispersioni estreme
     const heightVariation = (seed1 + seed2 + seed3) / 3;
-    const heightMultiplier = 3.0; // 🚀 TRIPLICATO per dispersione estrema Y
-    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 300; // Extra randomness
+    const heightMultiplier = 2.0; // Ridotto da 3.0 per controllo migliore
+    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 150;
     
     return new THREE.Vector3(x, y, z);
   }, [planet.name]); // Usa il nome per posizione stabile
@@ -213,18 +213,17 @@ function ExoPlanet({
   useFrame((_, delta) => {
     if (!meshRef.current || !orbitRef.current) return;
     
-    // 🌍 ROTAZIONE DEL PIANETA (giorno) - velocità fissa
-    const rotationPeriod = planet.period || 24; // ore
-    const rotationSpeed = delta / (rotationPeriod * 36); // velocità fissa più lenta
-    meshRef.current.rotation.y += rotationSpeed * 0.1; // Rotazione realistica ma visibile
+    // 🌍 ROTAZIONE PIANETA: VELOCITÀ UNIFORME PER TUTTI - 2 SECONDI PER GIRO
+    // Ignoriamo i dati del period dal backend perché alcuni sono estremi e causano "schegge impazzite"
+    const rotationSpeed = delta * Math.PI; // FISSO: π radianti/secondo = 2 secondi per giro completo
+    meshRef.current.rotation.y += rotationSpeed; // 🚀 TUTTI i pianeti girano alla stessa velocità!
     
-    // 🪐 MOVIMENTO ORBITALE (anno) - velocità fissa
-    const orbitalPeriod = (planet.period ?? 365) * 24; // giorni -> ore
-    const orbitalSpeed = delta / (orbitalPeriod * 360); // velocità fissa più lenta
-    orbitRef.current.rotation.y += orbitalSpeed * 0.05; // Movimento orbitale più lento
+    // 🪐 MOVIMENTO ORBITALE - Anche questo uniforme e lento
+    const orbitalSpeed = delta * 0.02; // FISSO: movimento orbitale molto lento per tutti
+    orbitRef.current.rotation.y += orbitalSpeed;
     
-    // ✨ Pulsazione atmosferica (effetto realistico)
-    const breathingSpeed = Math.sin(Date.now() * 0.001) * 0.02;
+    // ✨ Pulsazione atmosferica uniforme
+    const breathingSpeed = Math.sin(Date.now() * 0.0003) * 0.008; // FISSO: stessa per tutti
     if (meshRef.current.children[0]) {
       // Anima leggermente l'atmosfera
       const atmosphere = meshRef.current.children[0] as THREE.Mesh;
@@ -265,8 +264,8 @@ function ExoPlanet({
 
   return (
     <group ref={orbitRef}>
+      {/* 🎯 HITBOX INVISIBILE PIÙ GRANDE per click facile su mobile */}
       <mesh
-        ref={meshRef}
         position={position}
         onClick={() => onSelect(planet)}
         onPointerOver={(e) => {
@@ -277,12 +276,21 @@ function ExoPlanet({
           document.body.style.cursor = "default";
         }}
       >
+        <sphereGeometry args={[radius * 1.5, 16, 16]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
+      
+      {/* 🌍 PIANETA VISUALE */}
+      <mesh
+        ref={meshRef}
+        position={position}
+      >
         {/* 🌍 SUPERFICIE PLANETARIA SCIENTIFICAMENTE ACCURATA */}
         <sphereGeometry args={[radius, 64, 64]} />
         <meshStandardMaterial
           color={planetMaterials.baseColor}
           emissive={planetMaterials.emissiveColor}
-          emissiveIntensity={isSelected ? 0.4 : 0.2}
+          emissiveIntensity={isSelected ? 0.8 : 0.2} // 🚀 RADDOPPIATA l'intensità per selezione più visibile
           roughness={planetMaterials.roughness}
           metalness={planetMaterials.metalness}
           // Rilievi naturali per pianeti rocciosi
@@ -524,7 +532,7 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
   useRealisticPlanets = true // 🎨 Default: usa pianeti realistici
 }) => {
   const controlsRef = useRef<any>(null);
-  const filtered = useMemo(() => planets.slice(0, 200), [planets]);
+  const filtered = useMemo(() => planets.slice(0, 250), [planets]); // 🚀 Solo 250 pianeti per caricamento velocissimo!
 
   // 🎯 Funzione per calcolare la posizione di un pianeta (stessa logica di ExoPlanet)
   const calculatePlanetPosition = (planet: Planet): THREE.Vector3 => {

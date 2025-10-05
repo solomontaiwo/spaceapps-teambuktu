@@ -13,8 +13,8 @@ let lastLimitedLoadTime: number = 0;
 let lastAllLoadTime: number = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
 
-// 🚀 New function to get only 100 planets (default)
-export async function getLimitedExoplanets(limit: number = 100): Promise<any[]> {
+// 🚀 Fast loading with optimal number of planets for performance
+export async function getLimitedExoplanets(limit: number = 250): Promise<any[]> { // 🚀 Ottimizzato a 250 per caricamento veloce!
   const now = Date.now();
   
   // Se abbiamo dati freschi nella cache limitata, restituiscili

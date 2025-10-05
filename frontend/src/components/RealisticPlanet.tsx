@@ -64,12 +64,11 @@ export function RealisticPlanet({
     });
   }, [colors.atmosphere, selected]);
 
-  // 🔄 Animazioni
+  // 🔄 Animazioni UNIFORMI - Evita "schegge impazzite"
   useFrame((state) => {
     if (meshRef.current) {
-      const rotationSpeed = planetData?.period 
-        ? 0.01 / Math.sqrt(planetData.period) 
-        : 0.01;
+      // 🚀 VELOCITÀ UNIFORME PER TUTTI - ignora period dal database che può essere estremo
+      const rotationSpeed = 0.005; // FISSO: rotazione lenta e uniforme per tutti i pianeti
       
       meshRef.current.rotation.y += rotationSpeed;
       
@@ -81,7 +80,7 @@ export function RealisticPlanet({
     }
     
     if (atmosphereRef.current) {
-      atmosphereRef.current.rotation.y -= 0.005;
+      atmosphereRef.current.rotation.y -= 0.002; // 🚀 Anche atmosfera più lenta
       
       if (planetType === 'gaseous') {
         const scale = 1 + Math.sin(state.clock.elapsedTime) * 0.02;

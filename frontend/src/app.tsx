@@ -25,7 +25,7 @@ function mapBackendPlanet(p: any): Planet {
         p.kepoi_name ||
         p.name ||
         `Planet-${(p.id ?? Math.random().toString(36)).toString().slice(2, 11)}`,
-      period: p.koi_period ?? 365,
+      period: Math.max(1, Math.min(10000, p.koi_period ?? 365)), // 🚀 Clamp period tra 1 e 10000 giorni
       radius: p.koi_prad ?? 1,
       eq_temp: p.koi_teq ?? 300,
       star_temp: p.koi_steff ?? 5000,
@@ -37,7 +37,7 @@ function mapBackendPlanet(p: any): Planet {
 
   return {
     name: p.name || `Planet-${Math.random().toString(36).slice(2, 11)}`,
-    period: p.period ?? 365,
+    period: Math.max(1, Math.min(10000, p.period ?? 365)), // 🚀 Clamp period anche qui
     radius: p.radius ?? 1,
     eq_temp: p.eq_temp ?? 300,
     star_temp: p.star_temp ?? 5000,
@@ -91,26 +91,27 @@ export default function App() {
 
     const loadPlanets = async () => {
       try {
-        // Forza uso pianeti di test per ora
-        throw new Error("Using test planets for demo");
+        // 🚀 FORZIAMO L'USO DEI PIANETI DI TEST per rivedere i CANDIDATE bianchi
+        throw new Error("Forcing test planets to show CANDIDATE planets");
 
-        // --- produzione (sblocca quando pronto)
-        // const data = await getLimitedExoplanets(100);
-        // if (!isMounted) return;
-        // if (data?.length) {
-        //   const mapped = data.map(mapBackendPlanet);
-        //   setPlanets(mapped);
-        //   setLoading(false);
-        //   setTimeout(() => setFadeIn(true), 100);
-        //   setTimeout(loadAllPlanetsInBackground, 500);
-        // } else {
-        //   throw new Error("No data received");
-        // }
+        // 🚀 CARICAMENTO SUPER VELOCE - Solo 250 pianeti per performance ottimali!
+        const data = await getLimitedExoplanets(250);
+        if (!isMounted) return;
+        if (data?.length) {
+          const mapped = data.map(mapBackendPlanet);
+          setPlanets(mapped);
+          setLoading(false);
+          setTimeout(() => setFadeIn(true), 100);
+          setTimeout(loadAllPlanetsInBackground, 500);
+        } else {
+          throw new Error("No data received");
+        }
       } catch {
         if (!isMounted) return;
 
-        // --- dataset di test (estratto dal tuo snippet) ---
+        // --- dataset di test con MOLTI pianeti CANDIDATE bianchi! ---
         const testPlanets: Planet[] = [
+          // 🤖 AI PREDICTIONS - Pianeti CANDIDATE bianchi!
           { name: "Kepler-452b", period: 385, radius: 1.6, eq_temp: 265, star_temp: 5757, ra: 292.1, dec: 44.3, koi_disposition: "CANDIDATE" },
           { name: "Proxima Centauri b", period: 11.2, radius: 1.17, eq_temp: 234, star_temp: 3042, ra: 217.4, dec: -62.7, koi_disposition: "CANDIDATE" },
           { name: "Gliese 581g", period: 36.6, radius: 1.5, eq_temp: 228, star_temp: 3498, ra: 229.9, dec: -7.7, koi_disposition: "CANDIDATE" },
@@ -121,6 +122,13 @@ export default function App() {
           { name: "Kapteyn b", period: 48.6, radius: 1.25, eq_temp: 255, star_temp: 3570, ra: 78.8, dec: -45.0, koi_disposition: "CANDIDATE" },
           { name: "TOI-715b", period: 19.3, radius: 1.55, eq_temp: 280, star_temp: 3300, ra: 123.4, dec: 56.7, koi_disposition: "CANDIDATE" },
           { name: "LP 890-9c", period: 8.8, radius: 1.36, eq_temp: 300, star_temp: 3000, ra: 314.2, dec: -12.1, koi_disposition: "CANDIDATE" },
+          // 🤖 AI DISCOVERY - Pianeti predetti dall'AI
+          { name: "AI Discovery Alpha", period: 142, radius: 1.3, eq_temp: 255, star_temp: 4800, ra: 90.0, dec: 15.0, koi_disposition: "CANDIDATE" },
+          { name: "AI Discovery Beta", period: 67, radius: 1.1, eq_temp: 290, star_temp: 5200, ra: 210.0, dec: -20.0, koi_disposition: "CANDIDATE" },
+          { name: "AI Discovery Gamma", period: 203, radius: 1.4, eq_temp: 240, star_temp: 4600, ra: 45.0, dec: 30.0, koi_disposition: "CANDIDATE" },
+          { name: "Neural Net Find-1", period: 88, radius: 1.2, eq_temp: 275, star_temp: 5000, ra: 315.0, dec: -10.0, koi_disposition: "CANDIDATE" },
+          { name: "ML Prediction Zeta", period: 156, radius: 1.5, eq_temp: 260, star_temp: 4900, ra: 135.0, dec: 25.0, koi_disposition: "CANDIDATE" },
+          // Confermati per contrasto
           { name: "TRAPPIST-1e", period: 6.1, radius: 0.92, eq_temp: 251, star_temp: 2559, ra: 346.6, dec: -5.0, koi_disposition: "CONFIRMED" },
           { name: "Kepler-186f", period: 130, radius: 1.11, eq_temp: 188, star_temp: 3788, ra: 285.7, dec: 43.9, koi_disposition: "CONFIRMED" },
           { name: "Kepler-442b", period: 112, radius: 1.34, eq_temp: 233, star_temp: 4402, ra: 295.4, dec: 48.1, koi_disposition: "CONFIRMED" },
