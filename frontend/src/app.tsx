@@ -13,13 +13,15 @@ import { filterPlanets, getFilterInfo } from "./utils/planetFilters";
 
 // Funzione di mapping CORRETTA per i dati del backend
 function mapBackendPlanet(p: any): Planet {
+  console.log("🔍 Mapping planet data:", p); // Debug log
+  
   // Gestisce sia i dati dal database (/planets/) che dal CSV (/planets/all)
   const isDbFormat = p.koi_prad !== undefined; // I dati dal DB hanno koi_prad, quelli dal CSV hanno radius
   
   if (isDbFormat) {
     // Formato dal database (endpoint /planets/)
-    return {
-      name: p.kepoi_name || `Planet-${p.id || Math.random().toString(36).substr(2, 9)}`,
+    const mapped = {
+      name: p.kepoi_name || p.name || `Planet-${p.id || Math.random().toString(36).substr(2, 9)}`,
       period: p.koi_period || 365,
       radius: p.koi_prad || 1,
       eq_temp: p.koi_teq || 300,
@@ -27,9 +29,11 @@ function mapBackendPlanet(p: any): Planet {
       ra: p.ra || Math.random() * 360,
       dec: p.dec || (Math.random() - 0.5) * 180,
     };
+    console.log("🎯 Mapped DB planet:", mapped);
+    return mapped;
   } else {
     // Formato dal CSV (endpoint /planets/all)
-    return {
+    const mapped = {
       name: p.name || `Pianeta-${Math.random().toString(36).substr(2, 9)}`,
       period: p.period || 365,
       radius: p.radius || 1,
@@ -38,6 +42,8 @@ function mapBackendPlanet(p: any): Planet {
       ra: p.coordinates?.ra || Math.random() * 360,
       dec: p.coordinates?.dec || (Math.random() - 0.5) * 180,
     };
+    console.log("🎯 Mapped CSV planet:", mapped);
+    return mapped;
   }
 }
 
@@ -68,14 +74,20 @@ export default function App() {
       try {
         hasLoaded.current = true; // Marca come caricato PRIMA della chiamata API
         
-        // 🚀 Usa la nuova funzione per caricare solo 100 pianeti
+        console.log("🚀 Iniziando caricamento 100 pianeti...");
         const data = await getLimitedExoplanets(100);
+        console.log("📊 Dati ricevuti dal backend:", data.length, data[0]);
         
         if (!isMounted) return; // Evita state update se smontato
         
-        const mapped = data.map(mapBackendPlanet);
-        console.log("✅ Pianeti limitati mappati per l'app:", mapped.length);
-        setPlanets(mapped);
+        if (data && data.length > 0) {
+          const mapped = data.map(mapBackendPlanet);
+          console.log("✅ Pianeti limitati mappati per l'app:", mapped.length, mapped[0]);
+          setPlanets(mapped);
+        } else {
+          console.log("⚠️ Nessun dato ricevuto, uso pianeti di test");
+          throw new Error("No data received");
+        }
       } catch (err) {
         console.error("❌ Errore caricamento pianeti:", err);
         
