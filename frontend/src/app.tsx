@@ -141,7 +141,8 @@ export default function App() {
             eq_temp: 265,
             star_temp: 5757,
             ra: 292.1,
-            dec: 44.3
+            dec: 44.3,
+            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
           },
           {
             name: "TRAPPIST-1e",
@@ -150,7 +151,8 @@ export default function App() {
             eq_temp: 251,
             star_temp: 2559,
             ra: 346.6,
-            dec: -5.0
+            dec: -5.0,
+            koi_disposition: "CONFIRMED" // ✅ BLU
           },
           {
             name: "Proxima Centauri b",
@@ -159,7 +161,8 @@ export default function App() {
             eq_temp: 234,
             star_temp: 3042,
             ra: 217.4,
-            dec: -62.7
+            dec: -62.7,
+            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
           },
           {
             name: "HD 209458 b",
@@ -168,7 +171,8 @@ export default function App() {
             eq_temp: 1130,
             star_temp: 6065,
             ra: 330.8,
-            dec: 18.9
+            dec: 18.9,
+            koi_disposition: "FALSE POSITIVE" // ❌ GRIGIO
           },
           {
             name: "Gliese 581g",
@@ -177,7 +181,18 @@ export default function App() {
             eq_temp: 228,
             star_temp: 3498,
             ra: 229.9,
-            dec: -7.7
+            dec: -7.7,
+            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
+          },
+          {
+            name: "Team Buktu Discovery-1",
+            period: 294,
+            radius: 1.2,
+            eq_temp: 280,
+            star_temp: 5200,
+            ra: 180.0,
+            dec: 0.0,
+            koi_disposition: "CANDIDATE" // 🔍 PIANETA SPECIALE TEAM BUKTU!
           }
         ];
         
