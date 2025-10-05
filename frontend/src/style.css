@@ -106,17 +106,36 @@ button:focus-visible {
   .hud-bottom {
     flex-direction: column !important;
     align-items: center !important;
+    gap: 15px !important;
   }
 
   .hud-top > *,
   .hud-bottom > * {
-    width: 90% !important;
+    width: 100% !important;
+    max-width: 400px;
     text-align: center;
   }
 
+  /* Ottimizza gli input per mobile */
   input,
   select,
   button {
     font-size: 16px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Stile specifico per la search bar */
+  .search-input {
+    background: rgba(20, 20, 30, 0.9) !important;
+    border: 1px solid rgba(100, 108, 255, 0.3) !important;
+    color: white !important;
+  }
+
+  /* Riduce il padding dell'HUD su mobile */
+  .hud-container {
+    padding: 8px !important;
   }
 }

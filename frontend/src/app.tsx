@@ -57,9 +57,6 @@ export default function App() {
 
   const [fadeIn, setFadeIn] = useState(false);
   const [currentFilter, setCurrentFilter] = useState<FilterType>("none");
-  
-  // 🎨 Stato per pianeti ultra-realistici
-  const [useRealisticPlanets, setUseRealisticPlanets] = useState(true);
 
   // evita doppio caricamento con StrictMode
   const hasLoaded = useRef(false);
@@ -212,7 +209,6 @@ export default function App() {
         selected={selectedPlanet}
         onSelect={setSelectedPlanet}
         zoomToPlanet={zoomToPlanet}
-        useRealisticPlanets={useRealisticPlanets}
       />
 
       {/* Legenda dei pianeti - nascosta quando un pianeta è selezionato */}
@@ -287,32 +283,6 @@ export default function App() {
               {getFilterInfo(currentFilter, filteredPlanets.length, planets.length)}
             </div>
           )}
-          
-          {/* 🎨 Toggle per pianeti realistici */}
-          <div
-            style={{
-              background: "rgba(0,0,0,0.7)",
-              borderRadius: 12,
-              padding: "8px 12px",
-              fontSize: 12,
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              cursor: "pointer",
-              border: useRealisticPlanets ? "1px solid #4CAF50" : "1px solid #666",
-              transition: "border-color 0.3s ease"
-            }}
-            onClick={() => setUseRealisticPlanets(!useRealisticPlanets)}
-            title={useRealisticPlanets ? "Passa ai pianeti semplici" : "Attiva pianeti ultra-realistici"}
-          >
-            <span style={{ fontSize: 14 }}>
-              {useRealisticPlanets ? "🌍" : "⚪"}
-            </span>
-            <span>
-              {useRealisticPlanets ? "Realistici" : "Semplici"}
-            </span>
-          </div>
         </div>
       </HUD>
 

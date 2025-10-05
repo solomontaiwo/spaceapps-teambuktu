@@ -24,6 +24,7 @@ export default function HUD({ children, hidden = false }: HUDProps) {
 
   return (
     <div
+      className="hud-container"
       style={{
         position: "absolute",
         top: 0,
@@ -41,39 +42,43 @@ export default function HUD({ children, hidden = false }: HUDProps) {
         transition: "opacity 0.3s ease-in-out, visibility 0.3s ease-in-out",
       }}
     >
-      {/* Sezione superiore - Layout a quattro angoli su mobile e desktop */}
+      {/* Sezione superiore - Mobile responsive */}
       <div
+        className="hud-top"
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
           gap: "10px",
           pointerEvents: hidden ? "none" : "auto",
+          flexWrap: "wrap",
         }}
       >
         {/* Top left - SearchBar */}
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", flex: "1", minWidth: "200px" }}>
           {topChildren}
         </div>
         
         {/* Top right - Filter */}
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", flex: "0 0 auto" }}>
           {topRightChildren}
         </div>
       </div>
 
       {/* Sezione inferiore */}
       <div
+        className="hud-bottom"
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
           gap: "10px",
           pointerEvents: hidden ? "none" : "auto",
+          flexWrap: "wrap",
         }}
       >
-        <div>{bottomLeftChildren}</div>
-        <div>{bottomRightChildren}</div>
+        <div style={{ flex: "1" }}>{bottomLeftChildren}</div>
+        <div style={{ flex: "0 0 auto" }}>{bottomRightChildren}</div>
       </div>
     </div>
   );

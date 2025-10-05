@@ -88,7 +88,7 @@ export default function SearchBar({ onSearch, slot }: SearchBarProps) {
               border: "none",
               outline: "none",
               background: "transparent",
-              width: 200, // Aumentato per il testo più lungo
+              width: isMobile ? 160 : 200, // Adatta la larghezza per mobile
               fontSize: "14px",
               color: "#fff"
             }}
