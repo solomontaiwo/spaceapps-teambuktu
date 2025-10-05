@@ -57,6 +57,17 @@ class PredictionResult(BaseModel):
     prediction_class: str
     model_features_used: list
 
+@router.get("/test-ai")
+async def test_ai():
+    """
+    🧪 Test endpoint per verificare che l'AI sia raggiungibile
+    """
+    return {
+        "status": "AI_ONLINE",
+        "message": "🤖 Sistema HEXAPLANET operativo!",
+        "timestamp": "2024-10-05"
+    }
+
 @router.post("/predict-exoplanet", response_model=PredictionResult)
 async def predict_exoplanet(candidate: PlanetCandidate) -> PredictionResult:
     """

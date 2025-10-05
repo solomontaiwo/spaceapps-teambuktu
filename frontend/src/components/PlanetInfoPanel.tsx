@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { calculatePlanetSize, getPlanetCategoryColor, earthRadiiToKm, isInHabitableZone } from '../utils/planetSizeCalculations';
-import { predictExoplanet, PredictionResult } from '../api/predictions';
+import { predictExoplanet, PredictionResult, testAIConnection } from '../api/predictions';
 import './PlanetInfoPanel.css';
 
 // Original fields from KOI_cleaned.csv for more details
@@ -43,6 +43,12 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
     setError(null);
     
     try {
+      // 🧪 Prima testa la connessione
+      const isConnected = await testAIConnection();
+      if (!isConnected) {
+        throw new Error('Backend AI non raggiungibile');
+      }
+
       const result = await predictExoplanet({
         name: planet.name,
         period: planet.period || planet.koi_period,
@@ -57,7 +63,15 @@ const PlanetInfoPanel: React.FC<PlanetInfoPanelProps> = ({
       setPrediction(result);
     } catch (err) {
       console.error('Errore predizione AI:', err);
-      setError('🤖 Sistema AI temporaneamente non disponibile. Il nostro team di scienziati sta calibrando i telescopi!');
+      if (err instanceof Error) {
+        if (err.message.includes('Backend AI non raggiungibile') || err.message.includes('fetch')) {
+          setError('🚀 Backend AI offline! Avvia il server con: uvicorn main:app --reload --port 8000');
+        } else {
+          setError('🤖 Sistema AI temporaneamente non disponibile. Il nostro team di scienziati sta calibrando i telescopi!');
+        }
+      } else {
+        setError('🤖 Errore sconosciuto nel sistema AI');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -19,23 +19,50 @@ export interface PlanetCandidate {
 }
 
 /**
- * 🤖 Predice se un candidato è un HEXAPLANET
+ * � Testa se il backend AI è raggiungibile
+ */
+export async function testAIConnection(): Promise<boolean> {
+  try {
+    const response = await fetch('http://localhost:8000/api/test-ai');
+    const result = await response.json();
+    console.log('🤖 Test AI:', result);
+    return response.ok && result.status === 'AI_ONLINE';
+  } catch (err) {
+    console.error('❌ AI non raggiungibile:', err);
+    return false;
+  }
+}
+
+/**
+ * �🤖 Predice se un candidato è un HEXAPLANET
  */
 export async function predictExoplanet(candidate: PlanetCandidate): Promise<PredictionResult> {
-  const response = await fetch('/api/predict-exoplanet', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(candidate),
-  });
+  // 🚀 URL completo del backend per evitare problemi di proxy
+  const backendUrl = 'http://localhost:8000/api/predict-exoplanet';
+  
+  try {
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(candidate),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Errore nella predizione');
+    if (!response.ok) {
+      console.error('Errore response:', response.status, response.statusText);
+      throw new Error(`Backend non disponibile (${response.status})`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.error('Errore chiamata API:', err);
+    if (err instanceof TypeError && err.message.includes('fetch')) {
+      throw new Error('🤖 Sistema AI non disponibile. Assicurati che il backend sia attivo su localhost:8000');
+    }
+    throw err;
   }
-
-  return response.json();
 }
 
 /**
