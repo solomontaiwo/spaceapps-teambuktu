@@ -64,7 +64,7 @@ export default function App() {
   const loadAllPlanetsInBackground = async () => {
     try {
       console.log("🌌 Caricando tutti i pianeti in background...");
-      const allData = await getAllExoplanets();
+      const allData = await getAllExoplanets(true); // 🔥 Force reload per evitare cache conflict
       const allMapped = allData.map(mapBackendPlanet);
       console.log("✅ Tutti i pianeti caricati in background:", allMapped.length);
       
