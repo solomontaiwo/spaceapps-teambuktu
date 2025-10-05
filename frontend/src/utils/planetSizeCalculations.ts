@@ -27,42 +27,42 @@ export function calculatePlanetSize(backendRadius: number): PlanetSizeInfo {
     category = "Pianeta nano";
     description = "Oggetto planetario molto piccolo";
     realWorldComparison = "Più piccolo di Mercurio";
-    visualRadius = 0.2 + earthRadii * 1.5;
+    visualRadius = 0.6 + earthRadii * 2.5;  // 🚀 Molto più grande per visibilità
   } else if (earthRadii < 0.8) {
     category = "Pianeta terrestre piccolo";
     description = "Pianeta roccioso compatto";
     realWorldComparison = "Simile a Marte (0.53 R⊕)";
-    visualRadius = 0.3 + earthRadii * 1.2;
+    visualRadius = 0.8 + earthRadii * 2.0;  // 🚀 Aumentato per visibilità
   } else if (earthRadii < 1.3) {
     category = "Pianeta terrestre";
     description = "Pianeta roccioso simile alla Terra";
     realWorldComparison = earthRadii > 1.0 ? "Simile a Venere (0.95 R⊕)" : "Simile alla Terra (1.0 R⊕)";
-    visualRadius = 0.5 + earthRadii * 0.8;
+    visualRadius = 1.0 + earthRadii * 1.5;  // 🚀 Aumentato per visibilità
   } else if (earthRadii < 2.5) {
     category = "Super-Terra";
     description = "Pianeta roccioso più grande della Terra";
     realWorldComparison = "Pianeta roccioso massiccio";
-    visualRadius = 0.8 + earthRadii * 0.7;
+    visualRadius = 1.5 + earthRadii * 1.2;  // 🚀 Aumentato per visibilità
   } else if (earthRadii < 6.0) {
     category = "Mini-Nettuno";
     description = "Pianeta con atmosfera spessa";
     realWorldComparison = "Pianeta gassoso piccolo";
-    visualRadius = 1.2 + earthRadii * 0.5;
+    visualRadius = 2.0 + earthRadii * 0.8;  // 🚀 Aumentato per visibilità
   } else if (earthRadii < 15.0) {
     category = "Gigante ghiacciato";
     description = "Pianeta gassoso tipo Nettuno";
     realWorldComparison = `Simile a Nettuno (3.88 R⊕) o Urano (4.01 R⊕)`;
-    visualRadius = 2.0 + earthRadii * 0.3;
+    visualRadius = 3.0 + earthRadii * 0.5;  // 🚀 Aumentato per visibilità
   } else {
     category = "Gigante gassoso";
     description = "Pianeta massiccio tipo Giove";
     realWorldComparison = earthRadii > 20 ? "Più grande di Giove (11.2 R⊕)" : "Simile a Giove";
-    visualRadius = 3.5 + Math.log10(earthRadii / 10) * 2.5;
+    visualRadius = 5.0 + Math.log10(earthRadii / 10) * 3.5;  // 🚀 Aumentato per visibilità
   }
 
-  // Scala finale per la visualizzazione 3D
-  const scaleFactor = 0.8;
-  const finalRadius = Math.max(0.15, Math.min(6.0, visualRadius * scaleFactor));
+  // 🚀 SCALA FINALE AUMENTATA per migliore visibilità nella galassia
+  const scaleFactor = 1.8;  // Aumentato da 0.8 a 1.8
+  const finalRadius = Math.max(0.5, Math.min(12.0, visualRadius * scaleFactor));  // Range più ampio
 
   return {
     earthRadii,

@@ -103,37 +103,52 @@ function ExoPlanet({
   const meshRef = useRef<THREE.Mesh>(null);
   const orbitRef = useRef<THREE.Group>(null);
 
-  // 🌍 Posizionamento 3D COMPLETAMENTE RANDOM su TUTTA la griglia
+  // � POSIZIONAMENTO A SPIRALE GALATTICA REALISTICA
   const position = useMemo(() => {
-    // 🎲 DISTRIBUZIONE UNIFORME su TUTTA la superficie disponibile
-    const gridWidth = 1500;   // Larghezza totale griglia
-    const gridHeight = 150;   // Altezza totale griglia  
-    const gridDepth = 800;    // Profondità griglia
+    // Usa il nome del pianeta per generare una posizione stabile ma pseudo-casuale
+    const hash = planet.name.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
     
-    // 🌌 POSIZIONE COMPLETAMENTE CASUALE in tutto lo spazio
-    return new THREE.Vector3(
-      (Math.random() - 0.5) * gridWidth,    // Random da -750 a +750
-      (Math.random() - 0.5) * gridHeight,   // Random da -75 a +75  
-      (Math.random() - 0.5) * gridDepth     // Random da -400 a +400
-    );
+    // Normalizza l'hash per ottenere valori tra 0 e 1
+    const seed1 = Math.abs(hash) / 2147483647;
+    const seed2 = Math.abs(hash * 1.5) / 2147483647;
+    const seed3 = Math.abs(hash * 2.3) / 2147483647;
+    
+    // 🌌 PARAMETRI SPIRALE GALATTICA - DISTRIBUZIONE ESTREMA
+    const galaxyRadius = 1500;       // 🚀 RAGGIO MOLTO PIÙ GRANDE per dispersione estrema
+    const spiralArms = 4;            // Numero di bracci spirale
+    const spiralTightness = 0.8;     // 🚀 MOLTO più larghi i bracci
+    const coreRadius = 100;          // 🚀 Nucleo più grande
+    const galaxyThickness = 600;     // 🚀 SPESSORE ENORME per dispersione Y
+    
+    // 🚀 DISTRIBUZIONE ESTREMA - Meno concentrata al centro
+    const r = Math.pow(seed1, 0.3) * galaxyRadius + coreRadius; // Meno concentrazione centrale
+    
+    // 🚀 ANGOLO MOLTO PIÙ CASUALE
+    const baseAngle = seed2 * Math.PI * 4; // Doppio giro completo
+    const spiralOffset = (r * spiralTightness) + (seed3 * Math.PI * 2); // 🚀 MOLTA più variazione casuale
+    const armIndex = Math.floor(seed3 * spiralArms);
+    const armAngle = (armIndex * Math.PI * 2) / spiralArms;
+    const totalAngle = baseAngle + spiralOffset + armAngle;
+    
+    // 🚀 COORDINATE CON DISPERSIONE ESTREMA
+    const x = Math.cos(totalAngle) * r + (seed1 - 0.5) * 400; // +/- 200 di variazione extra
+    const z = Math.sin(totalAngle) * r + (seed2 - 0.5) * 400; // +/- 200 di variazione extra
+    
+    // 🚀 ALTEZZA: DISTRIBUZIONE COMPLETAMENTE CASUALE su Y
+    const heightVariation = (seed1 + seed2 + seed3) / 3;
+    const heightMultiplier = 3.0; // 🚀 TRIPLICATO per dispersione estrema Y
+    const y = (heightVariation - 0.5) * galaxyThickness * heightMultiplier + (seed3 - 0.5) * 300; // Extra randomness
+    
+    return new THREE.Vector3(x, y, z);
   }, [planet.name]); // Usa il nome per posizione stabile
 
   // � Calcolo REALISTICO delle dimensioni usando dati del backend
   const planetSizeInfo = useMemo(() => {
     const backendRadius = planet.radius || 1;
     const sizeInfo = calculatePlanetSize(backendRadius);
-    
-    // Debug: stampa informazioni dettagliate per i primi pianeti
-    if (planet.name && Math.random() < 0.05) { // 5% di chance per non spam
-      console.log(`🪐 ${planet.name}:`, {
-        'Raggio backend': `${backendRadius.toFixed(2)} R⊕`,
-        'Categoria': sizeInfo.category,
-        'Raggio visuale': `${sizeInfo.visualRadius.toFixed(2)}`,
-        'Confronto': sizeInfo.realWorldComparison,
-        'Temperatura': planet.eq_temp ? `${planet.eq_temp.toFixed(1)} K` : 'N/A',
-        'Abitabile': isInHabitableZone(backendRadius, planet.eq_temp || 300) ? '✅' : '❌'
-      });
-    }
     
     return sizeInfo;
   }, [planet.radius, planet.name, planet.eq_temp]);
@@ -473,24 +488,30 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
   return (
     <Canvas 
       camera={{ 
-        position: [0, 50, 100],
-        fov: 75,
+        position: [0, 500, 800],        // 🌌 Camera più distante per vedere la dispersione estrema
+        fov: 75,                       // 🔍 Campo visivo più ampio
         near: 0.01,
-        far: 50000
+        far: 100000                    // 🚀 Vista molto più lontana
       }}
       style={{ width: '100%', height: '100%' }}
     >
-      {/* 🌟 ILLUMINAZIONE REALISTICA per dettagli 3D */}
-      <ambientLight intensity={0.3} color="#1a1a3e" />
+      {/* 🌟 ILLUMINAZIONE GALATTICA per dettagli 3D */}
+      <ambientLight intensity={0.4} color="#1a1a3e" />
       
-      {/* ☀️ Luce solare principale */}
+      {/* ✨ Luce delle stelle centrali */}
+      <pointLight 
+        position={[0, 0, 0]} 
+        intensity={0.8} 
+        color="#4466bb"
+        distance={1000}
+        decay={2}
+      />
+      
+      {/* 🌌 Luce diffusa galattica */}
       <directionalLight 
-        position={[100, 100, 100]} 
-        intensity={1.2} 
-        color="#ffffff"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        position={[200, 200, 200]} 
+        intensity={0.3} 
+        color="#6677cc"
       />
       
       {/* 🌅 Luci secondarie per illuminazione diffusa */}
@@ -505,18 +526,67 @@ const GalaxyMap: React.FC<GalaxyMapProps> = ({
         intensity={0.2} 
       />
 
-      {/* 🌌 Griglia di riferimento astronomica MASSIMA ESTENSIONE */}
-      <gridHelper args={[1500, 150, "#444477", "#333355"]} position={[0, 0, 0]} />
+      {/* 🕳️ CENTRO GALATTICO - Buco nero supermassiccio */}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[8, 32, 32]} />
+        <meshStandardMaterial
+          color="#000000"
+          emissive="#110033"
+          emissiveIntensity={0.1}
+        />
+      </mesh>
       
-      {/* 🌟 Campo stellare galattico MASSIMA ESTENSIONE */}
+      {/* 🌌 DISCO GALATTICO CENTRALE - Materia densa */}
+      <mesh position={[0, 0, 0]}>
+        <torusGeometry args={[50, 20, 16, 100]} />
+        <meshStandardMaterial
+          color="#332255"
+          emissive="#221144"
+          emissiveIntensity={0.2}
+          transparent
+          opacity={0.4}
+        />
+      </mesh>
+      
+      {/* 🌀 BRACCI SPIRALE GALATTICI (effetto visivo) */}
+      {[0, 1, 2, 3].map((armIndex) => {
+        const armAngle = (armIndex * Math.PI * 2) / 4;
+        return (
+          <group key={armIndex} rotation={[0, armAngle, 0]}>
+            {/* Braccio spirale principale */}
+            <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[800, 800, 2, 64, 1, true, 0, Math.PI * 0.8]} />
+              <meshStandardMaterial
+                color="#2244aa"
+                transparent
+                opacity={0.03}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+        );
+      })}
+      
+      {/* 🌟 Campo stellare galattico OTTIMIZZATO per velocità */}
       <Stars 
-        radius={8000}           // 🚀 Campo stellare ESTREMAMENTE esteso
-        depth={3000}            // 🌟 Profondità massima per effetto 3D
-        count={30000}           // ⭐ MOLTE PIÙ STELLE per coprire lo spazio
-        factor={8}              // 🔥 Stelle luminose
+        radius={2000}           // 🌌 Raggio galattico esteso per nuova dispersione
+        depth={800}             // 🌟 Profondità del disco galattico
+        count={25000}           // ⭐ RIDOTTO per prestazioni migliori
+        factor={6}              // 🔥 Stelle brillanti
         fade 
-        speed={0.1}
+        speed={0.03}            // 🚀 Rotazione più veloce
       />
+      
+      {/* ✨ POLVERE COSMICA E NEBULOSE */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[900, 900, 120, 64]} />
+        <meshStandardMaterial
+          color="#001122"
+          transparent
+          opacity={0.02}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
       {/* 🪐 Esopianeti */}
       {filtered.map((p, i) => (

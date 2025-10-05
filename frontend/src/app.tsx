@@ -108,8 +108,9 @@ export default function App() {
         
         if (!isMounted) return;
         
-        // 🚀 Test planets if backend doesn't respond
+        // 🚀 MOLTI pianeti di test per impatto visivo spettacolare!
         const testPlanets: Planet[] = [
+          // 🔍 CANDIDATI BIANCHI (Team Buktu discoveries)
           {
             name: "Kepler-452b",
             period: 385,
@@ -118,17 +119,7 @@ export default function App() {
             star_temp: 5757,
             ra: 292.1,
             dec: 44.3,
-            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
-          },
-          {
-            name: "TRAPPIST-1e",
-            period: 6.1,
-            radius: 0.92,
-            eq_temp: 251,
-            star_temp: 2559,
-            ra: 346.6,
-            dec: -5.0,
-            koi_disposition: "CONFIRMED" // ✅ BLU
+            koi_disposition: "CANDIDATE"
           },
           {
             name: "Proxima Centauri b",
@@ -138,17 +129,7 @@ export default function App() {
             star_temp: 3042,
             ra: 217.4,
             dec: -62.7,
-            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
-          },
-          {
-            name: "HD 209458 b",
-            period: 3.5,
-            radius: 8.3,
-            eq_temp: 1130,
-            star_temp: 6065,
-            ra: 330.8,
-            dec: 18.9,
-            koi_disposition: "FALSE POSITIVE" // ❌ GRIGIO
+            koi_disposition: "CANDIDATE"
           },
           {
             name: "Gliese 581g",
@@ -158,7 +139,7 @@ export default function App() {
             star_temp: 3498,
             ra: 229.9,
             dec: -7.7,
-            koi_disposition: "CANDIDATE" // 🔍 BIANCO!
+            koi_disposition: "CANDIDATE"
           },
           {
             name: "Team Buktu Discovery-1",
@@ -168,7 +149,182 @@ export default function App() {
             star_temp: 5200,
             ra: 180.0,
             dec: 0.0,
-            koi_disposition: "CANDIDATE" // 🔍 PIANETA SPECIALE TEAM BUKTU!
+            koi_disposition: "CANDIDATE"
+          },
+          {
+            name: "Ross 128 b",
+            period: 9.9,
+            radius: 1.4,
+            eq_temp: 269,
+            star_temp: 3192,
+            ra: 177.0,
+            dec: 0.8,
+            koi_disposition: "CANDIDATE"
+          },
+          {
+            name: "Wolf 1061c",
+            period: 17.9,
+            radius: 1.4,
+            eq_temp: 223,
+            star_temp: 3342,
+            ra: 244.1,
+            dec: -12.6,
+            koi_disposition: "CANDIDATE"
+          },
+          // ✅ CONFERMATI BLU
+          {
+            name: "TRAPPIST-1e",
+            period: 6.1,
+            radius: 0.92,
+            eq_temp: 251,
+            star_temp: 2559,
+            ra: 346.6,
+            dec: -5.0,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "Kepler-186f",
+            period: 130,
+            radius: 1.11,
+            eq_temp: 188,
+            star_temp: 3788,
+            ra: 285.7,
+            dec: 43.9,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "Kepler-442b",
+            period: 112,
+            radius: 1.34,
+            eq_temp: 233,
+            star_temp: 4402,
+            ra: 295.4,
+            dec: 48.1,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "TOI-715b",
+            period: 19.3,
+            radius: 1.55,
+            eq_temp: 280,
+            star_temp: 3300,
+            ra: 123.4,
+            dec: 56.7,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "K2-18b",
+            period: 33,
+            radius: 2.3,
+            eq_temp: 270,
+            star_temp: 3457,
+            ra: 165.1,
+            dec: 7.6,
+            koi_disposition: "CONFIRMED"
+          },
+          // 🪐 GIGANTI GASSOSI
+          {
+            name: "HD 209458 b",
+            period: 3.5,
+            radius: 8.3,
+            eq_temp: 1130,
+            star_temp: 6065,
+            ra: 330.8,
+            dec: 18.9,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "51 Eridani b",
+            period: 10000,
+            radius: 12.0,
+            eq_temp: 700,
+            star_temp: 7200,
+            ra: 67.3,
+            dec: -2.5,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "WASP-12b",
+            period: 1.1,
+            radius: 11.7,
+            eq_temp: 2580,
+            star_temp: 6300,
+            ra: 96.1,
+            dec: 29.7,
+            koi_disposition: "CONFIRMED"
+          },
+          // ⭐ SUPER-TERRE
+          {
+            name: "Kepler-22b",
+            period: 290,
+            radius: 2.4,
+            eq_temp: 262,
+            star_temp: 5518,
+            ra: 290.7,
+            dec: 47.9,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "GJ 667Cc",
+            period: 28.1,
+            radius: 1.54,
+            eq_temp: 277,
+            star_temp: 3700,
+            ra: 261.2,
+            dec: -34.6,
+            koi_disposition: "CONFIRMED"
+          },
+          // ❌ FALSI POSITIVI GRIGI
+          {
+            name: "Kepler-438b",
+            period: 35.2,
+            radius: 1.12,
+            eq_temp: 276,
+            star_temp: 3952,
+            ra: 291.9,
+            dec: 43.1,
+            koi_disposition: "FALSE POSITIVE"
+          },
+          {
+            name: "Alpha Centauri Bb",
+            period: 3.2,
+            radius: 1.1,
+            eq_temp: 1500,
+            star_temp: 5790,
+            ra: 219.9,
+            dec: -60.8,
+            koi_disposition: "FALSE POSITIVE"
+          },
+          // 🌍 PIÙ PIANETI PER DENSITÀ VISIVA
+          {
+            name: "LHS 1140b",
+            period: 24.7,
+            radius: 1.4,
+            eq_temp: 230,
+            star_temp: 3216,
+            ra: 12.3,
+            dec: -15.4,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "TOI-849b",
+            period: 0.765,
+            radius: 3.4,
+            eq_temp: 1527,
+            star_temp: 5150,
+            ra: 56.8,
+            dec: -33.2,
+            koi_disposition: "CONFIRMED"
+          },
+          {
+            name: "KELT-9b",
+            period: 1.48,
+            radius: 10.4,
+            eq_temp: 4600,
+            star_temp: 10170,
+            ra: 308.0,
+            dec: 39.0,
+            koi_disposition: "CONFIRMED"
           }
         ];
         
