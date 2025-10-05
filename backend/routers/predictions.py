@@ -12,34 +12,34 @@ model = None
 model_path = os.path.join(os.path.dirname(__file__), "..", "models")
 
 def load_model():
-    """Carica il modello pickle al primo utilizzo"""
+    """Load the pickle model on first use"""
     global model
     if model is None:
         try:
-            # 🔍 Verifica che la cartella models esista
+            # 🔍 Check if models folder exists
             if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Cartella models non trovata: {model_path}")
+                raise FileNotFoundError(f"Models folder not found: {model_path}")
             
-            # 🔍 Cerca il file .pkl nella cartella models
+            # 🔍 Look for .pkl file in models folder
             pkl_files = [f for f in os.listdir(model_path) if f.endswith('.pkl')]
             if not pkl_files:
-                raise FileNotFoundError(f"Nessun file .pkl trovato in {model_path}/. Copia il tuo modello pickle in questa cartella.")
+                raise FileNotFoundError(f"No .pkl file found in {model_path}/. Copy your pickle model to this folder.")
             
-            model_file = pkl_files[0]  # Usa il primo file .pkl trovato
+            model_file = pkl_files[0]  # Use the first .pkl file found
             full_path = os.path.join(model_path, model_file)
             with open(full_path, 'rb') as f:
                 model = pickle.load(f)
-            print(f"✅ Modello caricato: {model_file}")
-            print(f"✅ Tipo modello: {type(model).__name__}")
+            print(f"✅ Model loaded: {model_file}")
+            print(f"✅ Model type: {type(model).__name__}")
             
         except Exception as e:
-            print(f"❌ Errore caricamento modello: {e}")
-            raise HTTPException(status_code=500, detail=f"Errore caricamento modello: {str(e)}")
+            print(f"❌ Model loading error: {e}")
+            raise HTTPException(status_code=500, detail=f"Model loading error: {str(e)}")
     
     return model
 
 class PlanetCandidate(BaseModel):
-    """Schema per i dati del candidato da predire"""
+    """Schema for candidate planet data to predict"""
     name: str
     period: float = None
     radius: float = None
@@ -50,7 +50,7 @@ class PlanetCandidate(BaseModel):
     dec: float = None
 
 class PredictionResult(BaseModel):
-    """Schema per il risultato della predizione"""
+    """Schema for prediction result"""
     planet_name: str
     is_exoplanet: bool
     confidence: float
@@ -60,40 +60,40 @@ class PredictionResult(BaseModel):
 @router.get("/test-ai")
 async def test_ai():
     """
-    🧪 Test endpoint per verificare che l'AI sia raggiungibile
+    🧪 Test endpoint to verify AI is reachable
     """
     return {
         "status": "AI_ONLINE",
-        "message": "🤖 Sistema HEXAPLANET operativo!",
-        "timestamp": "2024-10-05"
+        "message": "🤖 EXOPLANET system operational!",
+        "timestamp": "2025-10-05"
     }
 
 @router.post("/predict-exoplanet", response_model=PredictionResult)
 async def predict_exoplanet(candidate: PlanetCandidate) -> PredictionResult:
     """
-    🤖 Predice se un candidato è un HEXAPLANET usando il modello ML
+    🤖 Predict if a candidate is an EXOPLANET using ML model
     """
     try:
-        # Carica il modello
+        # Load the model
         ml_model = load_model()
         
-        # 🔧 Prepara le features per il modello
+        # 🔧 Prepare features for the model
         features = prepare_features(candidate)
         
-        # 🎯 Fai la predizione
+        # 🎯 Make prediction
         if hasattr(ml_model, 'predict_proba'):
-            # Modello con probabilità
+            # Model with probabilities
             probabilities = ml_model.predict_proba([features])[0]
             confidence = float(max(probabilities))
             prediction = int(ml_model.predict([features])[0])
         else:
-            # Modello senza probabilità
+            # Model without probabilities
             prediction = int(ml_model.predict([features])[0])
-            confidence = 0.85  # Valore di default più alto
+            confidence = 0.85  # Higher default value
         
-        # 🎨 Determina il risultato
-        is_exoplanet = bool(prediction == 1)  # Assumendo 1 = exoplanet, 0 = false positive
-        prediction_class = "HEXAPLANET" if is_exoplanet else "FALSE POSITIVE"
+        # 🎨 Determine result
+        is_exoplanet = bool(prediction == 1)  # Assuming 1 = exoplanet, 0 = false positive
+        prediction_class = "EXOPLANET" if is_exoplanet else "FALSE POSITIVE"
         
         return PredictionResult(
             planet_name=candidate.name,
@@ -104,8 +104,8 @@ async def predict_exoplanet(candidate: PlanetCandidate) -> PredictionResult:
         )
         
     except Exception as e:
-        print(f"❌ Errore predizione per {candidate.name}: {str(e)}")
-        # 🔥 Ritorna una predizione di fallback invece di errore
+        print(f"❌ Prediction error for {candidate.name}: {str(e)}")
+        # 🔥 Return fallback prediction instead of error
         return PredictionResult(
             planet_name=candidate.name,
             is_exoplanet=False,
@@ -116,10 +116,8 @@ async def predict_exoplanet(candidate: PlanetCandidate) -> PredictionResult:
 
 def prepare_features(candidate: PlanetCandidate) -> list:
     """
-    🔧 Prepara le features per il modello ML
-    MODIFICA QUESTA FUNZIONE in base alle features che usa il TUO modello
+    🔧 Prepare features for ML model
     """
-    # ⚠️ ESEMPIO - Modifica in base al tuo modello specifico
     features = [
         candidate.period or 0,
         candidate.radius or 1,
@@ -132,8 +130,7 @@ def prepare_features(candidate: PlanetCandidate) -> list:
 
 def get_feature_names() -> list:
     """
-    📋 Restituisce i nomi delle features usate dal modello
-    MODIFICA QUESTA LISTA in base al tuo modello specifico
+    📋 Returns the names of features used by the model
     """
     return [
         "period",
@@ -146,7 +143,7 @@ def get_feature_names() -> list:
 @router.get("/model-info")
 async def get_model_info() -> Dict[str, Any]:
     """
-    ℹ️ Restituisce informazioni sul modello caricato
+    ℹ️ Returns information about the loaded model
     """
     try:
         ml_model = load_model()

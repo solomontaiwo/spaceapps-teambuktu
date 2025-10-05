@@ -200,24 +200,6 @@ export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
         </div>
       )}
 
-      <button
-        onClick={() =>
-          window.open(`https://exoplanetarchive.ipac.caltech.edu/`, "_blank")
-        }
-        style={{
-          marginTop: "0.8rem",
-          background: "#4dabf7",
-          color: "black",
-          border: "none",
-          borderRadius: "5px",
-          padding: "0.4rem 0.8rem",
-          cursor: "pointer",
-          fontWeight: "bold",
-          width: "100%",
-        }}
-      >
-        🌌 More on NASA Archive
-      </button>
     </div>
   );
 }

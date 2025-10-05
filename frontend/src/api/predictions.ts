@@ -23,7 +23,7 @@ export interface PlanetCandidate {
  */
 export async function testAIConnection(): Promise<boolean> {
   try {
-    const response = await fetch('http://localhost:8000/api/test-ai');
+    const response = await fetch('https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/test-ai');
     const result = await response.json();
     console.log('🤖 Test AI:', result);
     return response.ok && result.status === 'AI_ONLINE';
@@ -37,8 +37,8 @@ export async function testAIConnection(): Promise<boolean> {
  * �🤖 Predice se un candidato è un HEXAPLANET
  */
 export async function predictExoplanet(candidate: PlanetCandidate): Promise<PredictionResult> {
-  // 🚀 URL completo del backend per evitare problemi di proxy
-  const backendUrl = 'http://localhost:8000/api/predict-exoplanet';
+  // 🚀 URL completo del backend Azure per evitare problemi di proxy
+  const backendUrl = 'https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/predict-exoplanet';
   
   try {
     const response = await fetch(backendUrl, {
@@ -59,7 +59,7 @@ export async function predictExoplanet(candidate: PlanetCandidate): Promise<Pred
   } catch (err) {
     console.error('Errore chiamata API:', err);
     if (err instanceof TypeError && err.message.includes('fetch')) {
-      throw new Error('🤖 Sistema AI non disponibile. Assicurati che il backend sia attivo su localhost:8000');
+      throw new Error('🤖 Sistema AI non disponibile. Assicurati che il backend Azure sia attivo.');
     }
     throw err;
   }
@@ -69,7 +69,7 @@ export async function predictExoplanet(candidate: PlanetCandidate): Promise<Pred
  * ℹ️ Ottiene informazioni sul modello ML
  */
 export async function getModelInfo() {
-  const response = await fetch('/api/model-info');
+  const response = await fetch('https://a-world-away-backend-hxfnfqheejfjesev.westeurope-01.azurewebsites.net/api/model-info');
   
   if (!response.ok) {
     throw new Error('Errore nel recupero info modello');
