@@ -94,23 +94,6 @@ export default function InsertPlanet({ onInsert, slot }: InsertPlanetProps) {
           >
             🪐 Add Exoplanet
           </button>
-          
-          <button
-            onClick={addRandomExoplanet}
-            style={{
-              padding: "10px 18px",
-              background: "linear-gradient(90deg, #ff6b6b, #ee5a24)",
-              border: "none",
-              borderRadius: 12,
-              color: "white",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              cursor: "pointer",
-              boxShadow: "0 0 10px rgba(255,255,255,0.3)"
-            }}
-          >
-            🎲 Random
-          </button>
         </div>
       ) : (
         <form

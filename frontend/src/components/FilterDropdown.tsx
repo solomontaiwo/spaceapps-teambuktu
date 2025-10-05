@@ -53,7 +53,6 @@ export default function FilterDropdown({ onFilterChange, currentFilter }: Filter
       style={{
         position: "relative",
         zIndex: 20, // Più alto dell'InfoPanel (z-index: 10)
-        border: "2px solid red", // DEBUG: Border rosso temporaneo per vedere il componente
       }}
     >
       {/* Bottone principale */}
