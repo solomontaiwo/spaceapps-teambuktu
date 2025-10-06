@@ -11,7 +11,7 @@ Exobabel empowers scientists and enthusiasts to explore this fundamental questio
 
 ## 🚀 **Overview**
 
-**🌐 [Prova Exobabel Live](https://exobabel.wiki/) - Esplora l'universo ora!**
+**🌐 [Try Exobabel Live](https://exobabel.wiki/) - Explore the universe now!**
 
 Exobabel is a comprehensive exoplanet exploration platform that combines:
 - **Real-time 3D Galaxy Visualization** with 60+ scientifically accurate exoplanets
