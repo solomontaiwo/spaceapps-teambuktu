@@ -810,7 +810,7 @@ See [EXOPLANET_IMAGES.md](EXOPLANET_IMAGES.md) for detailed attribution of all v
 - **GitHub Repository:** [spaceapps-teambuktu](https://github.com/solomontaiwo/spaceapps-teambuktu)
 - **Issues & Bug Reports:** [GitHub Issues](https://github.com/solomontaiwo/spaceapps-teambuktu/issues)
 - **Feature Requests:** [GitHub Discussions](https://github.com/solomontaiwo/spaceapps-teambuktu/discussions)
-- **Team Contact:** [Solomon Taiwo](mailto:solomon@example.com)
+- **Team Contact:** [Solomon Taiwo](mailto:taiwo.o.solomon@gmail.com)
 
 ---
 
